@@ -172,7 +172,7 @@ class ZipExporter {
     // حفظ في Download/FUTO THEME 1/
     final savedPath = await DownloadSaver.saveToDownloads(
       fileName: '$safeName.zip',
-      bytes: zipData!,
+      bytes: Uint8List.fromList(zipData!),
       mimeType: 'application/zip',
     );
     

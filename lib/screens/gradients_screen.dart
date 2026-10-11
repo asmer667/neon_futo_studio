@@ -67,7 +67,7 @@ class GradientsScreen extends StatelessWidget {
             ),
             itemCount: lightGradients.length,
             itemBuilder: (ctx, i) {
-              return _buildGradientTile(lightGradients[i]);
+              return _buildGradientTile(context, lightGradients[i]);
             },
           ),
           const SizedBox(height: 30),
@@ -98,7 +98,7 @@ class GradientsScreen extends StatelessWidget {
             ),
             itemCount: darkGradients.length,
             itemBuilder: (ctx, i) {
-              return _buildGradientTile(darkGradients[i]);
+              return _buildGradientTile(context, darkGradients[i]);
             },
           ),
         ],
@@ -106,7 +106,7 @@ class GradientsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGradientTile(List<Color> colors) {
+  Widget _buildGradientTile(BuildContext context, List<Color> colors) {
     return GestureDetector(
       onTap: () {
         onGradientSelected(colors);
