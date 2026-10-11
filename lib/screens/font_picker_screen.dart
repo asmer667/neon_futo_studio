@@ -149,7 +149,7 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
         case 'Lora': return GoogleFonts.lora(fontSize: size, fontWeight: weight);
         case 'PT Serif': return GoogleFonts.ptSerif(fontSize: size, fontWeight: weight);
         case 'Noto Serif': return GoogleFonts.notoSerif(fontSize: size, fontWeight: weight);
-        case 'Source Serif Pro': return GoogleFonts.sourceSerifPro(fontSize: size, fontWeight: weight);
+        case 'Source Serif Pro': return GoogleFonts.sourceSerif4(fontSize: size, fontWeight: weight);
         case 'Crimson Text': return GoogleFonts.crimsonText(fontSize: size, fontWeight: weight);
         case 'EB Garamond': return GoogleFonts.ebGaramond(fontSize: size, fontWeight: weight);
         case 'Libre Baskerville': return GoogleFonts.libreBaskerville(fontSize: size, fontWeight: weight);
@@ -161,7 +161,7 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
         case 'Abril Fatface': return GoogleFonts.abrilFatface(fontSize: size, fontWeight: weight);
         case 'Alfa Slab One': return GoogleFonts.alfaSlabOne(fontSize: size, fontWeight: weight);
         case 'Bungee': return GoogleFonts.bungee(fontSize: size, fontWeight: weight);
-        case 'Fredoka One': return GoogleFonts.fredokaOne(fontSize: size, fontWeight: weight);
+        case 'Fredoka One': return GoogleFonts.fredoka(fontSize: size, fontWeight: weight);
         case 'Lobster': return GoogleFonts.lobster(fontSize: size, fontWeight: weight);
         case 'Dancing Script': return GoogleFonts.dancingScript(fontSize: size, fontWeight: weight);
         case 'Indie Flower': return GoogleFonts.indieFlower(fontSize: size, fontWeight: weight);
@@ -195,7 +195,7 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
         case 'Markazi Text': return GoogleFonts.markaziText(fontSize: size, fontWeight: weight);
         case 'Mirza': return GoogleFonts.mirza(fontSize: size, fontWeight: weight);
         case 'Reem Kufi': return GoogleFonts.reemKufi(fontSize: size, fontWeight: weight);
-        case 'Scheherazade': return GoogleFonts.scheherazade(fontSize: size, fontWeight: weight);
+        case 'Scheherazade': return GoogleFonts.scheherazadeNew(fontSize: size, fontWeight: weight);
         case 'Aref Ruqaa': return GoogleFonts.arefRuqaa(fontSize: size, fontWeight: weight);
         case 'Lalezar': return GoogleFonts.lalezar(fontSize: size, fontWeight: weight);
         case 'Rakkas': return GoogleFonts.rakkas(fontSize: size, fontWeight: weight);

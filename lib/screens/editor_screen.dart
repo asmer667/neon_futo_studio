@@ -625,7 +625,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
       children: [
         _sectionHeader(AppTranslations.get('keyboard_section'), Icons.keyboard),
         SwitchListTile(
-          title: const Text(AppTranslations.get('key_borders')),
+          title: Text(AppTranslations.get('key_borders')),
           value: _theme.autoBorders,
           onChanged: (v) => setState(() => _theme.autoBorders = v),
         ),
@@ -639,7 +639,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           ),
         ),
         SwitchListTile(
-          title: const Text(AppTranslations.get('center_hints')),
+          title: Text(AppTranslations.get('center_hints')),
           value: _theme.centerHints,
           onChanged: (v) => setState(() => _theme.centerHints = v),
         ),
@@ -687,7 +687,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.gradient),
-          label: const Text(AppTranslations.get('select_gradient')),
+          label: Text(AppTranslations.get('select_gradient')),
         ),
         const SizedBox(height: 8),
         if (_theme.useGradient)
@@ -699,7 +699,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
               });
             },
             icon: const Icon(Icons.close),
-            label: const Text(AppTranslations.get('remove_gradient')),
+            label: Text(AppTranslations.get('remove_gradient')),
           ),
         const SizedBox(height: 8),
         // Opacity Slider
@@ -801,7 +801,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.search),
-          label: const Text(AppTranslations.get('browse_google_fonts')),
+          label: Text(AppTranslations.get('browse_google_fonts')),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
@@ -821,7 +821,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.crop_square),
-          label: const Text(AppTranslations.get('generate_rectangle')),
+          label: Text(AppTranslations.get('generate_rectangle')),
         ),
         const Divider(height: 40),
         _sectionHeader(AppTranslations.get('metadata'), Icons.info),
