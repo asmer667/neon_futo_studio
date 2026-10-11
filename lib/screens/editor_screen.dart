@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'colors_library.dart';
 import 'shapes_library.dart';
 import '../models/futo_theme.dart';
+import '../core/translations.dart';
 import '../services/zip_exporter.dart';
 import 'border_settings_screen.dart';
 
@@ -59,9 +60,18 @@ class _EditorScreenState extends State<EditorScreen> {
         title: Text(_theme.name),
         actions: [
           IconButton(
+            icon: const Icon(Icons.translate),
+            onPressed: () {
+              setState(() {
+                AppTranslations.isEnglish = !AppTranslations.isEnglish;
+              });
+            },
+            tooltip: AppTranslations.isEnglish ? 'العربية' : 'English',
+          ),
+          IconButton(
             icon: const Icon(Icons.download),
             onPressed: () => _exportTheme(),
-            tooltip: 'تصدير ZIP',
+            tooltip: AppTranslations.get('export_zip'),
           ),
         ],
       ),
@@ -145,7 +155,7 @@ class _EditorScreenState extends State<EditorScreen> {
           onTap: () => _pickColor(current, onPick),
           child: Container(
             width: 45,
-            height: 45,
+            height: 38,
             decoration: BoxDecoration(
               color: current,
               borderRadius: BorderRadius.circular(12),
@@ -241,15 +251,23 @@ class _EditorScreenState extends State<EditorScreen> {
   // ===== المعاينة =====
   Widget _buildKeyboardPreview() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(4.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // صف الأرقام
+          _buildRow(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], isNumberRow: true),
+          const SizedBox(height: 2),
+          // الصف الأول
           _buildRow(['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح']),
+          // الصف الثاني
           _buildRow(['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك']),
+          // الصف الثالث
           _buildRow(['ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة', 'و', 'ز', 'ظ']),
+          // الصف الرابع
           _buildRow(['ذ', 'د', 'ج', 'ح', 'خ', 'ه', 'ع', 'غ', 'ف', 'ق']),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+          // الصف الخامس (الأزرار الخاصة)
           Row(
             children: [
               _buildKey('123', isSpecial: true),
@@ -264,15 +282,19 @@ class _EditorScreenState extends State<EditorScreen> {
     );
   }
 
-  Widget _buildRow(List<String> keys) {
+  Widget _buildRow(List<String> keys, {bool isNumberRow = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(children: keys.map((k) => _buildKey(k)).toList()),
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Row(
+        children: keys.map((k) => _buildKey(k, isNumber: isNumberRow)).toList(),
+      ),
     );
   }
 
-  Widget _buildKey(String label, {int flex = 1, bool isSpecial = false}) {
-    final baseColor = isSpecial ? _theme.keyboardPrimary : _theme.keyboardContainer;
+  Widget _buildKey(String label, {int flex = 1, bool isSpecial = false, bool isNumber = false}) {
+    final baseColor = isSpecial
+        ? _theme.keyboardPrimary
+        : (isNumber ? _theme.keyboardContainer.withOpacity(0.7) : _theme.keyboardContainer);
     final textColor = isSpecial ? _theme.keyboardOnPrimary : _theme.onKeyboard;
     final hasImage = _theme.keyShape.isNotEmpty && _theme.keyShape.startsWith('assets/');
 
@@ -280,7 +302,7 @@ class _EditorScreenState extends State<EditorScreen> {
       flex: flex,
       child: Container(
         margin: const EdgeInsets.all(2),
-        height: 45,
+        height: 38,
         decoration: BoxDecoration(
           color: hasImage ? Colors.transparent : baseColor,
           borderRadius: BorderRadius.circular(_theme.keyRadius),
