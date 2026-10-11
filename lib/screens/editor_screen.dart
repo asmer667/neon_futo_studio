@@ -3,8 +3,10 @@ import 'colors_library.dart';
 import 'shapes_library.dart';
 import '../models/futo_theme.dart';
 import '../core/translations.dart';
+import '../services/history_service.dart';
 import '../services/zip_exporter.dart';
 import 'border_settings_screen.dart';
+import 'icons_library.dart';
 
 class EditorScreen extends StatefulWidget {
   final FutoTheme? initialTheme;
@@ -14,13 +16,18 @@ class EditorScreen extends StatefulWidget {
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
-class _EditorScreenState extends State<EditorScreen> {
+class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
   late FutoTheme _theme;
   int _selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
     _theme = widget.initialTheme ?? FutoTheme();
   }
 
@@ -132,6 +139,12 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   // ===== تبويب الألوان =====
+  @override
+  void dispose() {
+    if (_pulseController != null) _pulseController.dispose();
+    super.dispose();
+  }
+
   Widget _buildColorsTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -217,6 +230,26 @@ class _EditorScreenState extends State<EditorScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
+                  builder: (_) => IconsLibrary(
+                    onIconSelected: (icon) {
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('تم اختيار أيقونة')),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.emoji_emotions),
+            label: const Text('مكتبة الأيقونات'),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
                   builder: (_) => BorderSettingsScreen(
                     theme: _theme,
                     onThemeUpdated: (t) => setState(() {}),
@@ -250,7 +283,11 @@ class _EditorScreenState extends State<EditorScreen> {
 
   // ===== المعاينة =====
   Widget _buildKeyboardPreview() {
-    return Padding(
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.7, end: 1.0).animate(
+        CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+      ),
+      child: Padding(
       padding: const EdgeInsets.all(4.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -278,6 +315,7 @@ class _EditorScreenState extends State<EditorScreen> {
             ],
           ),
         ],
+      ),
       ),
     );
   }

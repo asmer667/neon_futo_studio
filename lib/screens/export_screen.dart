@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../services/zip_importer.dart';
+import '../services/history_service.dart';
+import 'editor_screen.dart';
 
 class ExportScreen extends StatefulWidget {
   const ExportScreen({super.key});
@@ -8,40 +11,65 @@ class ExportScreen extends StatefulWidget {
 }
 
 class _ExportScreenState extends State<ExportScreen> {
-  final List<Map<String, String>> _history = [
-    {'name': 'my_theme_2026.zip', 'date': 'منذ ساعة', 'size': '2.4 KB', 'status': 'success'},
-    {'name': 'neon_theme.zip', 'date': 'منذ 3 ساعات', 'size': '5.7 KB', 'status': 'success'},
-  ];
+  List<Map<String, String>> _history = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    final h = await HistoryService.getHistory();
+    setState(() => _history = h.map((e) => Map<String, String>.from(e)).toList());
+  }
+
+  Future<void> _importTheme() async {
+    try {
+      final importer = ZipImporter();
+      final theme = await importer.importTheme();
+      if (theme != null && mounted) {
+        await HistoryService.addOperation('${theme.name}.zip', 'import', '-');
+        await _loadHistory();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => EditorScreen(initialTheme: theme)),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('✅ تم استيراد: ${theme.name}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('❌ خطأ: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text('الاستيراد والتصدير')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // عنوان
           const Text('استيراد أو تصدير مشاريعك بسهولة',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),
           const Text('اختر من بين عدة صيغ مدعومة', style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 25),
 
-          // بطاقات الاستيراد والتصدير
           Row(
             children: [
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.upload_file,
                   title: 'استيراد',
-                  subtitle: 'استورد ملف ZIP أو JSON',
+                  subtitle: 'استورد ملف ZIP',
                   color: Colors.green,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('سيتم تفعيل الاستيراد قريباً')),
-                    );
-                  },
+                  onTap: _importTheme,
                 ),
               ),
               const SizedBox(width: 15),
@@ -63,7 +91,6 @@ class _ExportScreenState extends State<ExportScreen> {
 
           const SizedBox(height: 30),
 
-          // الصيغ المدعومة
           const Text('الصيغ المدعومة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           Wrap(
@@ -79,9 +106,15 @@ class _ExportScreenState extends State<ExportScreen> {
 
           const SizedBox(height: 30),
 
-          // سجل العمليات
           const Text('سجل العمليات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
+          if (_history.isEmpty)
+            const Card(
+              child: ListTile(
+                leading: Icon(Icons.history),
+                title: Text('لا توجد عمليات بعد'),
+              ),
+            ),
           ..._history.map((item) => Card(
             child: ListTile(
               leading: Container(
@@ -98,7 +131,6 @@ class _ExportScreenState extends State<ExportScreen> {
               ),
               title: Text(item['name']!),
               subtitle: Text('${item['date']} • ${item['size']}'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             ),
           )),
         ],
