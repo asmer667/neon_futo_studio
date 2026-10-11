@@ -61,7 +61,7 @@ class ZipExporter {
 
     // 5. توليد theme.txt
     final buffer = StringBuffer();
-    buffer.writeln('version = "${theme.version}"');
+    buffer.writeln('version = ${int.tryParse(theme.version) ?? 1}');
     buffer.writeln('name = "${theme.name}"');
     buffer.writeln('author = "${theme.author}"');
     buffer.writeln('id = "${theme.id}"');
