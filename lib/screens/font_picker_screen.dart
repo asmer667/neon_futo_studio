@@ -49,7 +49,6 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
     {'name': 'Lora', 'family': 'Lora', 'category': 'Serif'},
     {'name': 'PT Serif', 'family': 'PT Serif', 'category': 'Serif'},
     {'name': 'Noto Serif', 'family': 'Noto Serif', 'category': 'Serif'},
-    {'name': 'Source Serif Pro', 'family': 'Source Serif Pro', 'category': 'Serif'},
     {'name': 'Crimson Text', 'family': 'Crimson Text', 'category': 'Serif'},
     {'name': 'EB Garamond', 'family': 'EB Garamond', 'category': 'Serif'},
     {'name': 'Libre Baskerville', 'family': 'Libre Baskerville', 'category': 'Serif'},
@@ -103,7 +102,6 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
     {'name': 'Markazi Text', 'family': 'Markazi Text', 'category': 'Arabic'},
     {'name': 'Mirza', 'family': 'Mirza', 'category': 'Arabic'},
     {'name': 'Reem Kufi', 'family': 'Reem Kufi', 'category': 'Arabic'},
-    {'name': 'Scheherazade', 'family': 'Scheherazade', 'category': 'Arabic'},
     {'name': 'Aref Ruqaa', 'family': 'Aref Ruqaa', 'category': 'Arabic'},
     {'name': 'Lalezar', 'family': 'Lalezar', 'category': 'Arabic'},
     {'name': 'Rakkas', 'family': 'Rakkas', 'category': 'Arabic'},
@@ -149,7 +147,6 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
         case 'Lora': return GoogleFonts.lora(fontSize: size, fontWeight: weight);
         case 'PT Serif': return GoogleFonts.ptSerif(fontSize: size, fontWeight: weight);
         case 'Noto Serif': return GoogleFonts.notoSerif(fontSize: size, fontWeight: weight);
-        case 'Source Serif Pro': return GoogleFonts.sourceSerif4(fontSize: size, fontWeight: weight);
         case 'Crimson Text': return GoogleFonts.crimsonText(fontSize: size, fontWeight: weight);
         case 'EB Garamond': return GoogleFonts.ebGaramond(fontSize: size, fontWeight: weight);
         case 'Libre Baskerville': return GoogleFonts.libreBaskerville(fontSize: size, fontWeight: weight);
@@ -195,7 +192,6 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
         case 'Markazi Text': return GoogleFonts.markaziText(fontSize: size, fontWeight: weight);
         case 'Mirza': return GoogleFonts.mirza(fontSize: size, fontWeight: weight);
         case 'Reem Kufi': return GoogleFonts.reemKufi(fontSize: size, fontWeight: weight);
-        case 'Scheherazade': return GoogleFonts.scheherazadeNew(fontSize: size, fontWeight: weight);
         case 'Aref Ruqaa': return GoogleFonts.arefRuqaa(fontSize: size, fontWeight: weight);
         case 'Lalezar': return GoogleFonts.lalezar(fontSize: size, fontWeight: weight);
         case 'Rakkas': return GoogleFonts.rakkas(fontSize: size, fontWeight: weight);
