@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../models/shape_data.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class KeyTypesScreen extends StatefulWidget {
   final String currentShape;
   final String title;
+  final String type; // normal, pressed, functional, action
   final Function(String) onShapeSelected;
 
   const KeyTypesScreen({
@@ -11,6 +13,7 @@ class KeyTypesScreen extends StatefulWidget {
     required this.currentShape,
     required this.title,
     required this.onShapeSelected,
+    this.type = 'normal',
   });
 
   @override
@@ -18,107 +21,88 @@ class KeyTypesScreen extends StatefulWidget {
 }
 
 class _KeyTypesScreenState extends State<KeyTypesScreen> {
-  String _selectedCategory = 'الكل';
-  late List<ShapeItem> _allShapes;
-  late List<ShapeItem> _filteredShapes;
-
-  final List<String> _categories = [
-    'الكل', 'كلاسيكية', 'نجوم', 'قلوب', 'دوائر', 'سداسية',
-    'ماسية', 'موجات', 'زهور', 'كريستال', 'ثلج', 'نار',
-    'أوراق', 'أسهم', 'مربعة', 'مثلثة', 'معقدة', 'طبيعية',
-  ];
+  List<String> _allImages = [];
+  List<String> _filteredImages = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _allShapes = ShapeData.getAllShapes();
-    _filteredShapes = _allShapes;
+    _loadImages();
   }
 
-  void _filterShapes() {
-    setState(() {
-      if (_selectedCategory == 'الكل') {
-        _filteredShapes = _allShapes;
-      } else {
-        _filteredShapes = _allShapes.where((s) => s.category == _selectedCategory).toList();
-      }
-    });
+  Future<void> _loadImages() async {
+    try {
+      final jsonStr = await rootBundle.loadString('assets/key_buttons_data.json');
+      final data = json.decode(jsonStr) as Map<String, dynamic>;
+      final images = (data[widget.type] as List).cast<String>();
+
+      setState(() {
+        _allImages = images;
+        _filteredImages = images;
+        _isLoading = false;
+      });
+
+      debugPrint('✅ تم تحميل ${images.length} صورة من نوع ${widget.type}');
+    } catch (e) {
+      debugPrint('❌ خطأ: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _categories.length,
-              itemBuilder: (ctx, i) {
-                final cat = _categories[i];
-                final selected = cat == _selectedCategory;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: ChoiceChip(
-                    label: Text(cat),
-                    selected: selected,
-                    onSelected: (_) {
-                      setState(() => _selectedCategory = cat);
-                      _filterShapes();
-                    },
-                    selectedColor: Theme.of(context).colorScheme.primary,
+      appBar: AppBar(
+        title: Text('${widget.title} (${_filteredImages.length})'),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _filteredImages.isEmpty
+              ? const Center(child: Text('لا توجد صور'))
+              : GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                   ),
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _filteredShapes.length,
-              itemBuilder: (ctx, i) {
-                final shape = _filteredShapes[i];
-                final isSelected = widget.currentShape == shape.path;
-                return GestureDetector(
-                  onTap: () {
-                    widget.onShapeSelected(shape.path);
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected ? Colors.purple : Colors.white24,
-                        width: isSelected ? 3 : 1,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Image.asset(
-                        shape.path,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.broken_image,
-                          color: Colors.white38,
+                  itemCount: _filteredImages.length,
+                  itemBuilder: (ctx, i) {
+                    final fileName = _filteredImages[i];
+                    final path = 'assets/key_buttons/${widget.type}/$fileName';
+                    final isSelected = widget.currentShape == path;
+
+                    return GestureDetector(
+                      onTap: () {
+                        widget.onShapeSelected(path);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? Colors.purple : Colors.white24,
+                            width: isSelected ? 3 : 1,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Image.asset(
+                            path,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white38,
+                              size: 20,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                    );
+                  },
+                ),
     );
   }
 }

@@ -1089,4 +1089,100 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
       ),
     );
   }
+
+  Future<void> _pickKeyType(String type) async {
+    String current = '';
+    String title = '';
+
+    switch (type) {
+      case 'normal':
+        current = _theme.normalShape;
+        title = 'اختر شكل الأزرار العادية';
+        break;
+      case 'functional':
+        current = _theme.functionalShape;
+        title = 'اختر شكل الأزرار الوظيفية';
+        break;
+      case 'action':
+        current = _theme.actionShape;
+        title = 'اختر شكل أزرار الإجراءات';
+        break;
+      case 'pressed':
+        current = _theme.pressedShape;
+        title = 'اختر شكل الأزرار المضغوطة';
+        break;
+    }
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => KeyTypesScreen(
+          currentShape: current,
+          title: title,
+          type: type,
+          onShapeSelected: (path) {
+            _saveUndo();
+            setState(() {
+              switch (type) {
+                case 'normal':
+                  _theme.normalShape = path;
+                  break;
+                case 'functional':
+                  _theme.functionalShape = path;
+                  break;
+                case 'action':
+                  _theme.actionShape = path;
+                  break;
+                case 'pressed':
+                  _theme.pressedShape = path;
+                  break;
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _keyTypeTile({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required String shapePath,
+    required VoidCallback onPick,
+  }) {
+    final hasShape = shapePath.isNotEmpty && shapePath.startsWith('assets/');
+    return Card(
+      child: ListTile(
+        leading: hasShape
+            ? Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Image.asset(
+                    shapePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Icon(icon, color: Colors.purple),
+                  ),
+                ),
+              )
+            : Icon(icon, size: 40, color: Colors.grey),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(
+          hasShape ? shapePath.split('/').last : subtitle,
+          style: const TextStyle(fontSize: 12),
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: onPick,
+        ),
+        onTap: onPick,
+      ),
+    );
+  }
 }

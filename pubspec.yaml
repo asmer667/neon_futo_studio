@@ -57,4 +57,10 @@ flutter:
     - assets/23_special_shapes/
     - assets/24_fantasy/
     - assets/25_abstract/
+    - assets/key_buttons_data.json
+    - assets/key_buttons/normal/
+    - assets/key_buttons/pressed/
+    - assets/key_buttons/functional/
+    - assets/key_buttons/action/
+
     - assets/backgrounds/
