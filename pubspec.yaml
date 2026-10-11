@@ -1,0 +1,57 @@
+name: neon_futo_studio
+description: A custom keyboard theme editor and exporter compatible with FUTO Keyboard.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.5
+  archive: ^3.4.9
+  path_provider: ^2.1.1
+  image_picker: ^1.0.4
+  file_picker: ^6.1.1
+  google_fonts: ^6.1.0
+  dynamic_color: ^1.6.9
+  flex_color_scheme: ^7.3.1
+  toml: ^0.16.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/01_classic_shapes/
+    - assets/02_stars/
+    - assets/03_hearts/
+    - assets/04_circles/
+    - assets/05_hexagons/
+    - assets/06_diamonds/
+    - assets/07_waves/
+    - assets/08_flowers/
+    - assets/09_crystals/
+    - assets/10_snow/
+    - assets/11_fire/
+    - assets/12_leaves/
+    - assets/13_arrows/
+    - assets/14_squares/
+    - assets/15_triangles/
+    - assets/16_complex_geometric/
+    - assets/17_nature/
+    - assets/18_crystals_2/
+    - assets/19_metallic/
+    - assets/20_night/
+    - assets/21_seasonal/
+    - assets/22_alphabet_shapes/
+    - assets/23_special_shapes/
+    - assets/24_fantasy/
+    - assets/25_abstract/
+    - assets/backgrounds/
