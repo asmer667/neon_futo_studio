@@ -24,6 +24,10 @@ class FutoTheme {
   String? backgroundImage;
   List<Color>? gradientColors;
   bool useGradient;
+  int autoMode;
+  double backgroundOpacity;
+  double actionBarOpacity;
+  List<double>? cropRect; // [left, top, right, bottom] // 0=تلقائي, 1=حسب النظام, 2=لون تفاعلي, 3=داكن
   String? borderImage;
   Map<String, String> customAssets;
 
@@ -106,6 +110,10 @@ class FutoTheme {
     this.backgroundImage,
     this.gradientColors,
     this.useGradient = false,
+    this.autoMode = 0,
+    this.backgroundOpacity = 1.0,
+    this.actionBarOpacity = 0.5,
+    this.cropRect,
     this.borderImage,
     this.customAssets = const {},
     // الألوان الافتراضية

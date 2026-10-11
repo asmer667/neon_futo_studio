@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/zip_importer.dart';
+import '../services/download_saver.dart';
 import '../services/history_service.dart';
 import 'editor_screen.dart';
 
@@ -55,6 +56,26 @@ class _ExportScreenState extends State<ExportScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // بطاقة منح الصلاحية
+          Card(
+            color: Colors.orange.withOpacity(0.15),
+            child: ListTile(
+              leading: const Icon(Icons.folder_open, color: Colors.orange),
+              title: const Text('صلاحية التخزين'),
+              subtitle: const Text('منح الوصول للكتابة في مجلد التنزيلات'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () async {
+                final result = await DownloadSaver.requestManageExternalStorage();
+                if (result && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('افتح الإعدادات وامنح الصلاحية')),
+                  );
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+          
           const Text('استيراد أو تصدير مشاريعك بسهولة',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),

@@ -60,6 +60,20 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(AppTranslations.get('app_title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.translate),
+            onPressed: () {
+              setState(() {
+                AppTranslations.isEnglish = !AppTranslations.isEnglish;
+              });
+            },
+            tooltip: AppTranslations.isEnglish ? 'العربية' : 'English',
+          ),
+        ],
+      ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         switchInCurve: Curves.easeOutCubic,

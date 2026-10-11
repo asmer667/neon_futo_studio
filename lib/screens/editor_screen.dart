@@ -113,13 +113,24 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
-        title: Text(AppTranslations.get('export_zip')),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: AppTranslations.get('file_name'),
-            hintText: 'my_theme',
-          ),
+        title: Text(AppTranslations.get('save_theme')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: AppTranslations.get('theme_name'),
+                hintText: 'my_theme',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '${AppTranslations.get('exported_to')}: Download/FUTO THEME 1/',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -128,7 +139,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
-            child: Text(AppTranslations.get('export_zip')),
+            child: Text(AppTranslations.get('save')),
           ),
         ],
       ),
@@ -136,18 +147,25 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
 
     if (result != null && result.isNotEmpty) {
       try {
+        // تحديث اسم الثيم
+        _theme.name = result;
+        
         final exporter = ZipExporter();
         final path = await exporter.exportTheme(_theme, result);
         await HistoryService.addOperation('$result.zip', 'export', 'ZIP');
+        
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${AppTranslations.get('theme_exported')}: $path')),
+            SnackBar(
+              content: Text('✅ ${AppTranslations.get('saved_successfully')}: $path'),
+              duration: const Duration(seconds: 4),
+            ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${AppTranslations.get('error')}: $e')),
+            SnackBar(content: Text('❌ ${AppTranslations.get('error')}: $e')),
           );
         }
       }
@@ -274,10 +292,10 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       children: [
-                        _buildTabButton(0, 'Matchrules', Icons.link),
-                        _buildTabButton(1, 'Assets', Icons.folder),
-                        _buildTabButton(2, 'Colors', Icons.palette),
-                        _buildTabButton(3, 'Config', Icons.settings),
+                        _buildTabButton(0, AppTranslations.get('matchrules'), Icons.link),
+                        _buildTabButton(1, AppTranslations.get('assets_tab'), Icons.folder),
+                        _buildTabButton(2, AppTranslations.get('colors'), Icons.palette),
+                        _buildTabButton(3, AppTranslations.get('config'), Icons.settings),
                       ],
                     ),
                   ),
@@ -349,7 +367,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _sectionHeader('BORDER MATCHRULES', Icons.crop_square),
+        _sectionHeader(AppTranslations.get('border_matchrules'), Icons.crop_square),
         const SizedBox(height: 10),
         Card(
           child: ListTile(
@@ -371,7 +389,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const SizedBox(height: 20),
 
-        _sectionHeader('ICON MATCHRULES', Icons.emoji_emotions),
+        _sectionHeader(AppTranslations.get('icon_matchrules'), Icons.emoji_emotions),
         const SizedBox(height: 10),
         Card(
           child: ListTile(
@@ -418,7 +436,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _sectionHeader('BORDER ASSETS', Icons.crop_square),
+        _sectionHeader(AppTranslations.get('border_assets'), Icons.crop_square),
         const SizedBox(height: 10),
         GridView.count(
           shrinkWrap: true,
@@ -434,7 +452,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const SizedBox(height: 20),
 
-        _sectionHeader('ICON ASSETS', Icons.emoji_emotions),
+        _sectionHeader(AppTranslations.get('icon_assets'), Icons.emoji_emotions),
         const SizedBox(height: 10),
         GridView.count(
           shrinkWrap: true,
@@ -450,7 +468,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const SizedBox(height: 20),
 
-        _sectionHeader('OTHER ASSETS', Icons.folder),
+        _sectionHeader(AppTranslations.get('other_assets'), Icons.folder),
         const SizedBox(height: 10),
         Card(
           child: ListTile(
@@ -514,7 +532,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
-        _sectionHeader('MANUAL COLORS', Icons.palette),
+        _sectionHeader(AppTranslations.get('manual_colors'), Icons.palette),
         const SizedBox(height: 10),
         Wrap(
           spacing: 8,
@@ -605,9 +623,9 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _sectionHeader('KEYBOARD', Icons.keyboard),
+        _sectionHeader(AppTranslations.get('keyboard_section'), Icons.keyboard),
         SwitchListTile(
-          title: const Text('Key borders'),
+          title: const Text(AppTranslations.get('key_borders')),
           value: _theme.autoBorders,
           onChanged: (v) => setState(() => _theme.autoBorders = v),
         ),
@@ -621,13 +639,13 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           ),
         ),
         SwitchListTile(
-          title: const Text('Center hints'),
+          title: const Text(AppTranslations.get('center_hints')),
           value: _theme.centerHints,
           onChanged: (v) => setState(() => _theme.centerHints = v),
         ),
         const Divider(),
 
-        _sectionHeader('KEY TEXT', Icons.text_fields),
+        _sectionHeader(AppTranslations.get('key_text'), Icons.text_fields),
         ListTile(
           title: Text('Text scale: ${_theme.scaleText.toStringAsFixed(1)}'),
           subtitle: Slider(
@@ -649,7 +667,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const Divider(),
 
-        _sectionHeader('BACKGROUND IMAGE', Icons.wallpaper),
+        _sectionHeader(AppTranslations.get('background_image'), Icons.wallpaper),
         FilledButton.icon(
           onPressed: () {
             Navigator.push(
@@ -669,7 +687,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.gradient),
-          label: const Text('اختيار تدرج'),
+          label: const Text(AppTranslations.get('select_gradient')),
         ),
         const SizedBox(height: 8),
         if (_theme.useGradient)
@@ -681,8 +699,37 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
               });
             },
             icon: const Icon(Icons.close),
-            label: const Text('إزالة التدرج'),
+            label: const Text(AppTranslations.get('remove_gradient')),
           ),
+        const SizedBox(height: 8),
+        // Opacity Slider
+        ListTile(
+          title: Text('${AppTranslations.get('opacity')}: ${_theme.backgroundOpacity.toStringAsFixed(1)}'),
+          subtitle: Slider(
+            value: _theme.backgroundOpacity,
+            min: 0.0,
+            max: 1.0,
+            onChanged: (v) => setState(() => _theme.backgroundOpacity = v),
+          ),
+        ),
+        // Action Bar Opacity
+        ListTile(
+          title: Text('${AppTranslations.get('action_bar_opacity')}: ${_theme.actionBarOpacity.toStringAsFixed(1)}'),
+          subtitle: Slider(
+            value: _theme.actionBarOpacity,
+            min: 0.0,
+            max: 1.0,
+            onChanged: (v) => setState(() => _theme.actionBarOpacity = v),
+          ),
+        ),
+        // زر Crop
+        OutlinedButton.icon(
+          onPressed: () {
+            _showCropDialog();
+          },
+          icon: const Icon(Icons.crop),
+          label: Text(AppTranslations.get('crop')),
+        ),
         const SizedBox(height: 8),
         Card(
           child: ListTile(
@@ -712,7 +759,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const Divider(),
 
-        _sectionHeader('FONT', Icons.text_fields),
+        _sectionHeader(AppTranslations.get('font_section'), Icons.text_fields),
         Card(
           child: ListTile(
             leading: const Icon(Icons.font_download),
@@ -754,7 +801,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.search),
-          label: const Text('Browse Google Fonts'),
+          label: const Text(AppTranslations.get('browse_google_fonts')),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
@@ -774,10 +821,10 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             );
           },
           icon: const Icon(Icons.crop_square),
-          label: const Text('Generate Rectangle'),
+          label: const Text(AppTranslations.get('generate_rectangle')),
         ),
         const Divider(height: 40),
-        _sectionHeader('METADATA', Icons.info),
+        _sectionHeader(AppTranslations.get('metadata'), Icons.info),
         const SizedBox(height: 10),
         TextField(
           controller: TextEditingController(text: _theme.name),
@@ -813,6 +860,38 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     );
   }
 
+  void _showCropDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Crop Background'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('اختر نسبة القص'),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              children: [
+                '1:1', '4:3', '16:9', '3:4', '9:16', 'Free'
+              ].map((ratio) => ChoiceChip(
+                label: Text(ratio),
+                selected: false,
+                onSelected: (_) => Navigator.pop(ctx),
+              )).toList(),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _sectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -837,23 +916,85 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // شريط التلميحات (Hint Bar)
+            _buildHintBar(),
+            const SizedBox(height: 4),
+            // صف الأرقام
             _buildRow(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], isNumberRow: true),
             const SizedBox(height: 2),
+            // الصفوف العربية
             _buildRow(['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح']),
             _buildRow(['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك']),
             _buildRow(['ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة', 'و', 'ز', 'ظ']),
             _buildRow(['ذ', 'د', 'ج', 'ح', 'خ', 'ه', 'ع', 'غ', 'ف', 'ق']),
             const SizedBox(height: 4),
+            // الصف السفلي
             Row(
               children: [
-                _buildKey('123', isSpecial: true),
+                _buildKey('?123', isSpecial: true),
                 _buildKey('،', isSpecial: true),
+                _buildKey('☺', isSpecial: true),
                 _buildKey(' ', flex: 4),
                 _buildKey('.', isSpecial: true),
                 _buildKey('⌫', isSpecial: true),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHintBar() {
+    return Container(
+      height: 32,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: _theme.keyboardSurface,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          _buildHintKey('>'),
+          _buildHintSuggestion('thus'),
+          _buildHintSuggestion('the'),
+          _buildHintSuggestion('"thr"'),
+          const Spacer(),
+          Icon(Icons.mic, color: _theme.onKeyboard, size: 18),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHintKey(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: _theme.keyboardContainer.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: _theme.onKeyboard, fontSize: 12),
+      ),
+    );
+  }
+
+  Widget _buildHintSuggestion(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: _theme.keyboardContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: _theme.onKeyboard,
+          fontSize: 12,
+          fontFamily: _theme.fontFamily,
         ),
       ),
     );

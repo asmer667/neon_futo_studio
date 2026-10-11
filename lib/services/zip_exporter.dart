@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import '../models/futo_theme.dart';
+import 'download_saver.dart';
 
 class ZipExporter {
   Future<String> exportTheme(FutoTheme theme, String fileName) async {
@@ -64,6 +65,9 @@ class ZipExporter {
     buffer.writeln('name = "${theme.name}"');
     buffer.writeln('author = "${theme.author}"');
     buffer.writeln('id = "${theme.id}"');
+    if (theme.description.isNotEmpty) {
+      buffer.writeln('description = "${theme.description}"');
+    }
     buffer.writeln();
 
     buffer.writeln('[options]');
@@ -145,7 +149,11 @@ class ZipExporter {
     if (bgAssetName != null) {
       buffer.writeln('[options.background]');
       buffer.writeln('image = "assets/$bgAssetName"');
-      buffer.writeln('opacity = 1.0');
+      buffer.writeln('opacity = ${theme.backgroundOpacity}');
+      buffer.writeln('action_bar_opacity = ${theme.actionBarOpacity}');
+      if (theme.cropRect != null && theme.cropRect!.length == 4) {
+        buffer.writeln('cropping = [${theme.cropRect![0]}, ${theme.cropRect![1]}, ${theme.cropRect![2]}, ${theme.cropRect![3]}]');
+      }
       buffer.writeln();
     }
 
