@@ -560,6 +560,56 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
+        _sectionHeader('AUTO COLORS', Icons.auto_mode),
+        const SizedBox(height: 10),
+        Card(
+          child: Column(
+            children: [
+              SwitchListTile(
+                title: const Text('Primary (auto)'),
+                value: _theme.autoPrimary,
+                onChanged: (v) => setState(() => _theme.autoPrimary = v),
+              ),
+              SwitchListTile(
+                title: const Text('On Primary (auto)'),
+                value: _theme.autoOnPrimary,
+                onChanged: (v) => setState(() => _theme.autoOnPrimary = v),
+              ),
+              SwitchListTile(
+                title: const Text('Primary Container (auto)'),
+                value: _theme.autoPrimaryContainer,
+                onChanged: (v) => setState(() => _theme.autoPrimaryContainer = v),
+              ),
+              SwitchListTile(
+                title: const Text('Secondary (auto)'),
+                value: _theme.autoSecondary,
+                onChanged: (v) => setState(() => _theme.autoSecondary = v),
+              ),
+              SwitchListTile(
+                title: const Text('Background (auto)'),
+                value: _theme.autoBackground,
+                onChanged: (v) => setState(() => _theme.autoBackground = v),
+              ),
+              SwitchListTile(
+                title: const Text('Surface (auto)'),
+                value: _theme.autoSurface,
+                onChanged: (v) => setState(() => _theme.autoSurface = v),
+              ),
+              SwitchListTile(
+                title: const Text('Surface Variant (auto)'),
+                value: _theme.autoSurfaceVariant,
+                onChanged: (v) => setState(() => _theme.autoSurfaceVariant = v),
+              ),
+              SwitchListTile(
+                title: const Text('Outline (auto)'),
+                value: _theme.autoOutline,
+                onChanged: (v) => setState(() => _theme.autoOutline = v),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
         _sectionHeader(AppTranslations.get('manual_colors'), Icons.palette),
         const SizedBox(height: 10),
         Wrap(
@@ -651,36 +701,50 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _sectionHeader(AppTranslations.get('keyboard_section'), Icons.keyboard),
+        // ===== KEYBOARD =====
+        _sectionHeader('KEYBOARD', Icons.keyboard),
         SwitchListTile(
-          title: Text(AppTranslations.get('key_borders')),
-          value: _theme.autoBorders,
-          onChanged: (v) => setState(() => _theme.autoBorders = v),
+          title: const Text('Key borders'),
+          value: _theme.keyBorders,
+          onChanged: (v) => setState(() => _theme.keyBorders = v),
         ),
         ListTile(
-          title: Text('Roundedness: ${_theme.keyRadius.toStringAsFixed(1)}'),
+          title: Text('Roundedness: ${_theme.roundedness.toStringAsFixed(2)}'),
           subtitle: Slider(
-            value: _theme.keyRadius,
-            min: 0,
-            max: 30,
-            onChanged: (v) => setState(() => _theme.keyRadius = v),
+            value: _theme.roundedness,
+            min: 0.0,
+            max: 1.0,
+            divisions: 20,
+            onChanged: (v) => setState(() => _theme.roundedness = v),
           ),
         ),
         SwitchListTile(
-          title: Text(AppTranslations.get('center_hints')),
+          title: const Text('Center hints'),
           value: _theme.centerHints,
           onChanged: (v) => setState(() => _theme.centerHints = v),
         ),
         const Divider(),
 
-        _sectionHeader(AppTranslations.get('key_text'), Icons.text_fields),
+        // ===== KEY TEXT =====
+        _sectionHeader('KEY TEXT', Icons.text_fields),
         ListTile(
-          title: Text('Text scale: ${_theme.scaleText.toStringAsFixed(1)}'),
+          title: Text('Text scale: ${_theme.scaleText.toStringAsFixed(2)}'),
           subtitle: Slider(
             value: _theme.scaleText,
             min: 0.5,
             max: 2.0,
+            divisions: 30,
             onChanged: (v) => setState(() => _theme.scaleText = v),
+          ),
+        ),
+        ListTile(
+          title: Text('Hint scale: ${_theme.hintScale.toStringAsFixed(2)}'),
+          subtitle: Slider(
+            value: _theme.hintScale,
+            min: 0.5,
+            max: 2.0,
+            divisions: 30,
+            onChanged: (v) => setState(() => _theme.hintScale = v),
           ),
         ),
         ListTile(
@@ -693,72 +757,83 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             onChanged: (v) => setState(() => _theme.weightText = v.toInt()),
           ),
         ),
+        ListTile(
+          title: Text('Hint weight: ${_theme.hintWeight}'),
+          subtitle: Slider(
+            value: _theme.hintWeight.toDouble(),
+            min: 100,
+            max: 900,
+            divisions: 8,
+            onChanged: (v) => setState(() => _theme.hintWeight = v.toInt()),
+          ),
+        ),
         const Divider(),
 
-        _sectionHeader(AppTranslations.get('background_image'), Icons.wallpaper),
-        FilledButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => GradientsScreen(
-                  onGradientSelected: (colors) {
-                    _saveUndo();
-                    setState(() {
-                      _theme.gradientColors = colors;
-                      _theme.useGradient = true;
-                      _theme.backgroundImage = null;
-                    });
-                  },
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.gradient),
-          label: Text(AppTranslations.get('select_gradient')),
+        // ===== BACKGROUND IMAGE =====
+        _sectionHeader('BACKGROUND IMAGE', Icons.wallpaper),
+        SwitchListTile(
+          title: const Text('تفعيل Crop'),
+          value: _theme.cropEnabled,
+          onChanged: (v) => setState(() => _theme.cropEnabled = v),
         ),
-        const SizedBox(height: 8),
-        if (_theme.useGradient)
-          OutlinedButton.icon(
-            onPressed: () {
-              setState(() {
-                _theme.useGradient = false;
-                _theme.gradientColors = null;
-              });
-            },
-            icon: const Icon(Icons.close),
-            label: Text(AppTranslations.get('remove_gradient')),
+        if (_theme.cropEnabled) ...[
+          ListTile(
+            title: Text('Left: ${_theme.cropLeft.toStringAsFixed(2)}'),
+            subtitle: Slider(
+              value: _theme.cropLeft,
+              min: 0.0,
+              max: 1.0,
+              onChanged: (v) => setState(() => _theme.cropLeft = v),
+            ),
           ),
-        const SizedBox(height: 8),
-        // Opacity Slider
+          ListTile(
+            title: Text('Top: ${_theme.cropTop.toStringAsFixed(2)}'),
+            subtitle: Slider(
+              value: _theme.cropTop,
+              min: 0.0,
+              max: 1.0,
+              onChanged: (v) => setState(() => _theme.cropTop = v),
+            ),
+          ),
+          ListTile(
+            title: Text('Right: ${_theme.cropRight.toStringAsFixed(2)}'),
+            subtitle: Slider(
+              value: _theme.cropRight,
+              min: 0.0,
+              max: 1.0,
+              onChanged: (v) => setState(() => _theme.cropRight = v),
+            ),
+          ),
+          ListTile(
+            title: Text('Bottom: ${_theme.cropBottom.toStringAsFixed(2)}'),
+            subtitle: Slider(
+              value: _theme.cropBottom,
+              min: 0.0,
+              max: 1.0,
+              onChanged: (v) => setState(() => _theme.cropBottom = v),
+            ),
+          ),
+        ],
         ListTile(
-          title: Text('${AppTranslations.get('opacity')}: ${_theme.backgroundOpacity.toStringAsFixed(1)}'),
+          title: Text('Opacity: ${_theme.backgroundOpacity.toStringAsFixed(2)}'),
           subtitle: Slider(
             value: _theme.backgroundOpacity,
             min: 0.0,
             max: 1.0,
+            divisions: 20,
             onChanged: (v) => setState(() => _theme.backgroundOpacity = v),
           ),
         ),
-        // Action Bar Opacity
         ListTile(
-          title: Text('${AppTranslations.get('action_bar_opacity')}: ${_theme.actionBarOpacity.toStringAsFixed(1)}'),
+          title: Text('Action bar opacity: ${_theme.actionBarOpacity.toStringAsFixed(2)}'),
           subtitle: Slider(
             value: _theme.actionBarOpacity,
             min: 0.0,
             max: 1.0,
+            divisions: 20,
             onChanged: (v) => setState(() => _theme.actionBarOpacity = v),
           ),
         ),
-        // زر Crop
-        OutlinedButton.icon(
-          onPressed: () {
-            _showCropDialog();
-          },
-          icon: const Icon(Icons.crop),
-          label: Text(AppTranslations.get('crop')),
-        ),
-        const SizedBox(height: 8),
         Card(
           child: ListTile(
             leading: _theme.backgroundImage != null
@@ -787,7 +862,8 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         const Divider(),
 
-        _sectionHeader(AppTranslations.get('font_section'), Icons.text_fields),
+        // ===== FONT =====
+        _sectionHeader('FONT', Icons.text_fields),
         Card(
           child: ListTile(
             leading: const Icon(Icons.font_download),
@@ -831,28 +907,10 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           icon: const Icon(Icons.search),
           label: Text(AppTranslations.get('browse_google_fonts')),
         ),
-        const SizedBox(height: 8),
-        OutlinedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => GenerateRectangleScreen(
-                  onGenerate: (params) {
-                    _saveUndo();
-                    setState(() {
-                      _theme.keyRadius = params['roundedness'];
-                    });
-                  },
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.crop_square),
-          label: Text(AppTranslations.get('generate_rectangle')),
-        ),
         const Divider(height: 40),
-        _sectionHeader(AppTranslations.get('metadata'), Icons.info),
+
+        // ===== METADATA =====
+        _sectionHeader('METADATA', Icons.info),
         const SizedBox(height: 10),
         TextField(
           controller: TextEditingController(text: _theme.name),
@@ -885,38 +943,6 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           decoration: const InputDecoration(labelText: 'Version', border: OutlineInputBorder()),
         ),
       ],
-    );
-  }
-
-  void _showCropDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Crop Background'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('اختر نسبة القص'),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              children: [
-                '1:1', '4:3', '16:9', '3:4', '9:16', 'Free'
-              ].map((ratio) => ChoiceChip(
-                label: Text(ratio),
-                selected: false,
-                onSelected: (_) => Navigator.pop(ctx),
-              )).toList(),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
-          ),
-        ],
-      ),
     );
   }
 

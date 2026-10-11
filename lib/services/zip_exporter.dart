@@ -106,22 +106,23 @@ class ZipExporter {
     buffer.writeln('[options]');
     buffer.writeln('auto_borders = ${theme.autoBorders}');
     buffer.writeln('center_hints = ${theme.centerHints}');
-    buffer.writeln('roundedness = ${theme.keyRadius / 30}');
+    buffer.writeln('roundedness = ${theme.roundedness}');
     buffer.writeln('scale_text = ${theme.scaleText}');
-    buffer.writeln('scale_hints = ${theme.scaleText}');
+    buffer.writeln('scale_hints = ${theme.hintScale}');
     buffer.writeln('weight_text = ${theme.weightText}');
-    buffer.writeln('weight_hints = ${theme.weightText}');
+    buffer.writeln('weight_hints = ${theme.hintWeight}');
+    buffer.writeln('key_borders = ${theme.keyBorders}');
     buffer.writeln();
 
     // ===== قسم colors (25 لوناً كما في FUTO) =====
     buffer.writeln('[colors]');
-    buffer.writeln('primary = "${_hexA(theme.primary)}"');
-    buffer.writeln('on_primary = "${_hexA(theme.onPrimary)}"');
-    buffer.writeln('primary_container = "${_hexA(theme.primaryContainer)}"');
+    _colorLine(buffer, 'primary', theme.primary, theme.autoPrimary);
+    _colorLine(buffer, 'on_primary', theme.onPrimary, theme.autoOnPrimary);
+    _colorLine(buffer, 'primary_container', theme.primaryContainer, theme.autoPrimaryContainer);
     buffer.writeln('on_primary_container = "${_hexA(theme.onPrimaryContainer)}"');
     buffer.writeln('inverse_primary = "${_hexA(theme.inversePrimary)}"');
     buffer.writeln();
-    buffer.writeln('secondary = "${_hexA(theme.secondary)}"');
+    _colorLine(buffer, 'secondary', theme.secondary, theme.autoSecondary);
     buffer.writeln('on_secondary = "${_hexA(theme.onSecondary)}"');
     buffer.writeln('secondary_container = "${_hexA(theme.secondaryContainer)}"');
     buffer.writeln('on_secondary_container = "${_hexA(theme.onSecondaryContainer)}"');
@@ -131,12 +132,12 @@ class ZipExporter {
     buffer.writeln('tertiary_container = "${_hexA(theme.tertiaryContainer)}"');
     buffer.writeln('on_tertiary_container = "${_hexA(theme.onTertiaryContainer)}"');
     buffer.writeln();
-    buffer.writeln('background = "${_hexA(theme.background)}"');
+    _colorLine(buffer, 'background', theme.background, theme.autoBackground);
     buffer.writeln('on_background = "${_hexA(theme.onBackground)}"');
     buffer.writeln();
-    buffer.writeln('surface = "${_hexA(theme.surface)}"');
+    _colorLine(buffer, 'surface', theme.surface, theme.autoSurface);
     buffer.writeln('on_surface = "${_hexA(theme.onSurface)}"');
-    buffer.writeln('surface_variant = "${_hexA(theme.surfaceVariant)}"');
+    _colorLine(buffer, 'surface_variant', theme.surfaceVariant, theme.autoSurfaceVariant);
     buffer.writeln('on_surface_variant = "${_hexA(theme.onSurfaceVariant)}"');
     buffer.writeln('surface_tint = "${_hexA(theme.surfaceTint)}"');
     buffer.writeln('inverse_surface = "${_hexA(theme.inverseSurface)}"');
@@ -147,7 +148,7 @@ class ZipExporter {
     buffer.writeln('error_container = "${_hexA(theme.errorContainer)}"');
     buffer.writeln('on_error_container = "${_hexA(theme.onErrorContainer)}"');
     buffer.writeln();
-    buffer.writeln('outline = "${_hexA(theme.outline)}"');
+    _colorLine(buffer, 'outline', theme.outline, theme.autoOutline);
     buffer.writeln('outline_variant = "${_hexA(theme.outlineVariant)}"');
     buffer.writeln('scrim = "${_hexA(theme.scrim)}"');
     buffer.writeln();
@@ -182,26 +183,43 @@ class ZipExporter {
       buffer.writeln('image = "$bgAssetName"');
       buffer.writeln('opacity = ${theme.backgroundOpacity}');
       buffer.writeln('action_bar_opacity = ${theme.actionBarOpacity}');
+      if (theme.cropEnabled) {
+        buffer.writeln('cropping = [${theme.cropLeft}, ${theme.cropTop}, ${theme.cropRight}, ${theme.cropBottom}]');
+      }
       buffer.writeln();
     }
 
-    // ===== قسم matchrules =====
+    // ===== قسم matchrules (متقدم) =====
     if (normalAsset != null) {
+      // 1. الأزرار المضغوطة
+      buffer.writeln('[[matchrules.border]]');
+      buffer.writeln('selector = "pressed functional"');
+      buffer.writeln('asset = "${pressedAsset ?? normalAsset}"');
+      buffer.writeln();
+
+      buffer.writeln('[[matchrules.border]]');
+      buffer.writeln('selector = "pressed action"');
+      buffer.writeln('asset = "${pressedAsset ?? normalAsset}"');
+      buffer.writeln();
+
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "pressed"');
       buffer.writeln('asset = "${pressedAsset ?? normalAsset}"');
       buffer.writeln();
 
+      // 2. الأزرار الوظيفية
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "functional"');
       buffer.writeln('asset = "${functionalAsset ?? normalAsset}"');
       buffer.writeln();
 
+      // 3. أزرار الإجراءات
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "action"');
       buffer.writeln('asset = "${actionAsset ?? normalAsset}"');
       buffer.writeln();
 
+      // 4. الأزرار العادية
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "normal"');
       buffer.writeln('asset = "$normalAsset"');
@@ -210,11 +228,38 @@ class ZipExporter {
 
     // ===== قسم asset.border =====
     if (normalAsset != null) {
-      _writeAssetBorder(buffer, 'Button-default.png', theme.onKeyboard);
-      if (pressedAsset != null) _writeAssetBorder(buffer, 'Button-default-press.png', Colors.white);
-      if (functionalAsset != null) _writeAssetBorder(buffer, 'Button-function.png', theme.onKeyboard);
-      if (actionAsset != null) _writeAssetBorder(buffer, 'Button-action.png', theme.onKeyboard);
+      _writeAssetBorder(buffer, 'Button-default.png',
+        theme.normalBackgroundTint, theme.normalForegroundTint,
+        theme.normalSlicingLeft, theme.normalSlicingTop,
+        theme.normalSlicingRight, theme.normalSlicingBottom);
+
+      if (pressedAsset != null) {
+        _writeAssetBorder(buffer, 'Button-default-press.png',
+          theme.pressedBackgroundTint, theme.pressedForegroundTint,
+          theme.pressedSlicingLeft, theme.pressedSlicingTop,
+          theme.pressedSlicingRight, theme.pressedSlicingBottom);
+      }
+
+      if (functionalAsset != null) {
+        _writeAssetBorder(buffer, 'Button-function.png',
+          theme.functionalBackgroundTint, theme.functionalForegroundTint,
+          theme.functionalSlicingLeft, theme.functionalSlicingTop,
+          theme.functionalSlicingRight, theme.functionalSlicingBottom);
+      }
+
+      if (actionAsset != null) {
+        _writeAssetBorder(buffer, 'Button-action.png',
+          theme.actionBackgroundTint, theme.actionForegroundTint,
+          theme.actionSlicingLeft, theme.actionSlicingTop,
+          theme.actionSlicingRight, theme.actionSlicingBottom);
+      }
     }
+
+    // ===== قسم asset.icon =====
+    if (theme.backspaceIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-backspace.png');
+    if (theme.shiftIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-shift.png');
+    if (theme.enterIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-enter.png');
+    if (theme.emojiIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-emoji.png');
 
     // 6. إضافة theme.txt إلى الأرشيف
     final configContent = utf8.encode(buffer.toString());
@@ -238,19 +283,45 @@ class ZipExporter {
   }
 
 
-  void _writeAssetBorder(StringBuffer buffer, String name, Color fg) {
+  void _writeAssetBorder(
+    StringBuffer buffer,
+    String name,
+    String bgTint,
+    String fgTint,
+    double sl,
+    double st,
+    double sr,
+    double sb,
+  ) {
     buffer.writeln('[[asset.border]]');
     buffer.writeln('name = "$name"');
-    buffer.writeln('background_tint = "#ffffff"');
-    buffer.writeln('foreground_tint = "${_hexA(fg)}"');
+    buffer.writeln('background_tint = "$bgTint"');
+    buffer.writeln('foreground_tint = "$fgTint"');
     buffer.writeln('padding = [0, 0, 0, 0]');
-    buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
+    buffer.writeln('slicing = [$sl, $st, $sr, $sb]');
     buffer.writeln('gap = [1, 1, 1, 1]');
     buffer.writeln('target_density = 640');
     buffer.writeln();
   }
 
+  void _writeAssetIcon(StringBuffer buffer, String name) {
+    buffer.writeln('[[asset.icon]]');
+    buffer.writeln('name = "$name"');
+    buffer.writeln('target_density = 640');
+    buffer.writeln();
+  }
+
   /// تحويل اللون إلى صيغة #RRGGBBAA (كما يطلب FUTO)
+
+  /// كتابة سطر لون (يدوي أو تلقائي)
+  void _colorLine(StringBuffer buffer, String key, Color color, bool isAuto) {
+    if (isAuto) {
+      buffer.writeln('$key = "auto"');
+    } else {
+      buffer.writeln('$key = "${_hexA(color)}"');
+    }
+  }
+
   String _hexA(Color color) {
     final r = (color.value >> 16) & 0xFF;
     final g = (color.value >> 8) & 0xFF;

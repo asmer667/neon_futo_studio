@@ -24,7 +24,67 @@ class FutoTheme {
   String normalShape;      // شكل الأزرار العادية
   String functionalShape;  // شكل الأزرار الوظيفية (Shift, Backspace, Enter)
   String actionShape;      // شكل أزرار الإجراءات
-  String pressedShape;     // شكل الأزرار المضغوطة
+  String pressedShape;
+
+  // 9-slicing لكل نوع زر (نِسَب من 0.0 إلى 1.0)
+  double normalSlicingLeft;
+  double normalSlicingTop;
+  double normalSlicingRight;
+  double normalSlicingBottom;
+
+  double functionalSlicingLeft;
+  double functionalSlicingTop;
+  double functionalSlicingRight;
+  double functionalSlicingBottom;
+
+  double actionSlicingLeft;
+  double actionSlicingTop;
+  double actionSlicingRight;
+  double actionSlicingBottom;
+
+  double pressedSlicingLeft;
+  double pressedSlicingTop;
+  double pressedSlicingRight;
+  double pressedSlicingBottom;
+
+  // Tint colors لكل نوع
+  String normalBackgroundTint;
+  String normalForegroundTint;
+  String functionalBackgroundTint;
+  String functionalForegroundTint;
+  String actionBackgroundTint;
+  String actionForegroundTint;
+  String pressedBackgroundTint;
+  String pressedForegroundTint;
+
+  // Icon paths
+  String backspaceIcon;
+  String shiftIcon;
+  String enterIcon;
+  String emojiIcon;
+
+  // AUTO colors (ألوان مشتقة تلقائياً)
+  bool autoPrimary;
+  bool autoOnPrimary;
+  bool autoPrimaryContainer;
+  bool autoSecondary;
+  bool autoBackground;
+  bool autoSurface;
+  bool autoSurfaceVariant;
+  bool autoOutline;
+
+  // Crop للخلفية
+  bool cropEnabled;
+  double cropLeft;
+  double cropTop;
+  double cropRight;
+  double cropBottom;
+
+  // Config المتقدم
+  double hintScale;
+  int hintWeight;
+  bool keyBorders;
+  double roundedness; // 0.0 - 1.0     // شكل الأزرار المضغوطة
   String? backgroundImage;
   List<Color>? gradientColors;
   bool useGradient;
@@ -115,6 +175,51 @@ class FutoTheme {
     this.functionalShape = '',
     this.actionShape = '',
     this.pressedShape = '',
+    this.normalSlicingLeft = 0.3,
+    this.normalSlicingTop = 0.3,
+    this.normalSlicingRight = 0.7,
+    this.normalSlicingBottom = 0.7,
+    this.functionalSlicingLeft = 0.3,
+    this.functionalSlicingTop = 0.3,
+    this.functionalSlicingRight = 0.7,
+    this.functionalSlicingBottom = 0.7,
+    this.actionSlicingLeft = 0.3,
+    this.actionSlicingTop = 0.3,
+    this.actionSlicingRight = 0.7,
+    this.actionSlicingBottom = 0.7,
+    this.pressedSlicingLeft = 0.3,
+    this.pressedSlicingTop = 0.3,
+    this.pressedSlicingRight = 0.7,
+    this.pressedSlicingBottom = 0.7,
+    this.normalBackgroundTint = '#ffffff',
+    this.normalForegroundTint = '#414447',
+    this.functionalBackgroundTint = '#ffffff',
+    this.functionalForegroundTint = '#414447',
+    this.actionBackgroundTint = '#ffffff',
+    this.actionForegroundTint = '#414447',
+    this.pressedBackgroundTint = '#ffffff',
+    this.pressedForegroundTint = '#ffffff',
+    this.backspaceIcon = '',
+    this.shiftIcon = '',
+    this.enterIcon = '',
+    this.emojiIcon = '',
+    this.autoPrimary = false,
+    this.autoOnPrimary = false,
+    this.autoPrimaryContainer = false,
+    this.autoSecondary = false,
+    this.autoBackground = false,
+    this.autoSurface = false,
+    this.autoSurfaceVariant = false,
+    this.autoOutline = false,
+    this.cropEnabled = false,
+    this.cropLeft = 0.0,
+    this.cropTop = 0.0,
+    this.cropRight = 1.0,
+    this.cropBottom = 1.0,
+    this.hintScale = 1.0,
+    this.hintWeight = 400,
+    this.keyBorders = true,
+    this.roundedness = 0.0,
     this.backgroundImage,
     this.gradientColors,
     this.useGradient = false,
