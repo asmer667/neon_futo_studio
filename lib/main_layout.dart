@@ -20,19 +20,11 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
   int _selectedIndex = 0;
   late AnimationController _animController;
 
-  final List<Widget> _screens = [
-    const EditorScreen(),
-    ColorsLibrary(
-      initialColor: Colors.purple,
-      currentTheme: FutoTheme(),
-      onColorSelected: (c) {},
-    ),
-    ShapesLibrary(onShapeSelected: (s) {}),
-    BackgroundsScreen(onBackgroundSelected: (p) {}),
-    AssetsScreen(onAssetSelected: (t, p) {}),
-    const ExportScreen(),
-    const PresetThemesScreen(),
-  ];
+  // الثيم المشترك بين كل الشاشات
+  final FutoTheme _sharedTheme = FutoTheme();
+
+  // GlobalKeys للوصول إلى الشاشات
+  final GlobalKey<_EditorScreenWrapperState> _editorKey = GlobalKey();
 
   @override
   void initState() {
@@ -40,8 +32,7 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 350),
-    );
-    _animController.forward();
+    )..forward();
   }
 
   @override
@@ -55,6 +46,39 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
     setState(() => _selectedIndex = i);
     _animController.reset();
     _animController.forward();
+  }
+
+  // الدوال التي تستقبل الاختيار من الشريط السفلي
+  void _onColorSelected(Color c) {
+    _sharedTheme.primary = c;
+    _sharedTheme.keyboardPrimary = c;
+    _sharedTheme.keyboardContainer = c.withOpacity(0.3);
+    _sharedTheme.outline = c;
+    _sharedTheme.keyboardBorder = c;
+    // تحديث المحرر
+    _editorKey.currentState?.updateTheme(_sharedTheme);
+    setState(() {});
+  }
+
+  void _onShapeSelected(String path) {
+    _sharedTheme.keyShape = path;
+    _editorKey.currentState?.updateTheme(_sharedTheme);
+    setState(() {});
+  }
+
+  void _onBackgroundSelected(String path) {
+    _sharedTheme.backgroundImage = path;
+    _sharedTheme.useGradient = false;
+    _editorKey.currentState?.updateTheme(_sharedTheme);
+    setState(() {});
+  }
+
+  void _onAssetSelected(String type, String path) {
+    if (type == 'background') _sharedTheme.backgroundImage = path;
+    if (type == 'font') _sharedTheme.fontPath = path;
+    if (type == 'shape') _sharedTheme.keyShape = path;
+    _editorKey.currentState?.updateTheme(_sharedTheme);
+    setState(() {});
   }
 
   @override
@@ -92,12 +116,11 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
         },
         child: KeyedSubtree(
           key: ValueKey<int>(_selectedIndex),
-          child: _screens[_selectedIndex],
+          child: _buildScreen(),
         ),
       ),
       bottomNavigationBar: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A2E),
           boxShadow: [
@@ -155,5 +178,67 @@ class _MainLayoutState extends State<MainLayout> with SingleTickerProviderStateM
         ),
       ),
     );
+  }
+
+  Widget _buildScreen() {
+    switch (_selectedIndex) {
+      case 0:
+        return _EditorScreenWrapper(
+          key: _editorKey,
+          theme: _sharedTheme,
+        );
+      case 1:
+        return ColorsLibrary(
+          initialColor: _sharedTheme.primary,
+          currentTheme: _sharedTheme,
+          onColorSelected: _onColorSelected,
+        );
+      case 2:
+        return ShapesLibrary(onShapeSelected: _onShapeSelected);
+      case 3:
+        return BackgroundsScreen(
+          currentBackground: _sharedTheme.backgroundImage,
+          onBackgroundSelected: _onBackgroundSelected,
+        );
+      case 4:
+        return AssetsScreen(onAssetSelected: _onAssetSelected);
+      case 5:
+        return const ExportScreen();
+      case 6:
+        return const PresetThemesScreen();
+      default:
+        return _EditorScreenWrapper(key: _editorKey, theme: _sharedTheme);
+    }
+  }
+}
+
+/// Wrapper للوصول إلى المحرر من الخارج
+class _EditorScreenWrapper extends StatefulWidget {
+  final FutoTheme theme;
+  const _EditorScreenWrapper({super.key, required this.theme});
+
+  @override
+  State<_EditorScreenWrapper> createState() => _EditorScreenWrapperState();
+}
+
+class _EditorScreenWrapperState extends State<_EditorScreenWrapper> {
+  late FutoTheme _theme;
+
+  @override
+  void initState() {
+    super.initState();
+    _theme = widget.theme;
+  }
+
+  /// دالة عامة لتحديث الثيم من الخارج
+  void updateTheme(FutoTheme newTheme) {
+    setState(() {
+      _theme = newTheme;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return EditorScreen(initialTheme: _theme);
   }
 }

@@ -6,6 +6,8 @@ import 'font_picker_screen.dart';
 import 'generate_rectangle_screen.dart';
 import 'border_settings_screen.dart';
 import 'assets_screen.dart';
+import 'theme_settings_screen.dart';
+import 'gradients_screen.dart';
 import '../models/futo_theme.dart';
 import '../core/translations.dart';
 import '../services/zip_exporter.dart';
@@ -37,6 +39,17 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(EditorScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // تحديث الثيم عند تغييره من الخارج (الشريط السفلي)
+    if (widget.initialTheme != null && widget.initialTheme != oldWidget.initialTheme) {
+      setState(() {
+        _theme = widget.initialTheme!;
+      });
+    }
   }
 
   @override
@@ -248,7 +261,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                     ? DecorationImage(
                         image: AssetImage(_theme.backgroundImage!),
                         fit: BoxFit.cover,
-                        opacity: 0.5,
+                        opacity: 0.7,
                         onError: (_, __) {},
                       )
                     : null,
@@ -261,7 +274,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                     Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: _theme.keyboardSurface.withOpacity(0.3),
+                          color: Colors.black.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),

@@ -167,11 +167,20 @@ class ZipExporter {
     archive.addFile(ArchiveFile('theme.txt', configContent.length, configContent));
 
     final zipData = ZipEncoder().encode(archive);
-    final dir = await getApplicationDocumentsDirectory();
     final safeName = fileName.replaceAll(RegExp(r'[^\w\s-]'), '_');
-    final zipFile = File('${dir.path}/$safeName.zip');
-    await zipFile.writeAsBytes(zipData!);
-    return zipFile.path;
+    
+    // حفظ في Download/FUTO THEME 1/
+    final savedPath = await DownloadSaver.saveToDownloads(
+      fileName: '$safeName.zip',
+      bytes: zipData!,
+      mimeType: 'application/zip',
+    );
+    
+    if (savedPath == null) {
+      throw Exception('فشل الحفظ في مجلد التنزيلات. تأكد من منح الصلاحيات.');
+    }
+    
+    return savedPath;
   }
 
   String _hex(Color color) {
