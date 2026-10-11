@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class FutoTheme {
   String name;
   String author;
+  String description;
   String id;
   String version;
   bool autoBorders;
@@ -21,6 +22,8 @@ class FutoTheme {
   String? fontPath;
   String keyShape;
   String? backgroundImage;
+  List<Color>? gradientColors;
+  bool useGradient;
   String? borderImage;
   Map<String, String> customAssets;
 
@@ -70,10 +73,22 @@ class FutoTheme {
   Color keyboardShadow;
   Color keyboardBorder;
   Color keyboardRipple;
+  Color surfaceTint;
+  Color surfaceBright;
+  Color surfaceDim;
+  Color surfaceContainer;
+  Color surfaceContainerHigh;
+  Color surfaceContainerHighest;
+  Color surfaceContainerLow;
+  Color surfaceContainerLowest;
+  Color keyboardSurfaceVariant;
+  Color keyboardContainerVariant;
+
 
   FutoTheme({
     this.name = 'ثيم جديد',
     this.author = 'NEON FUTO STUDIO',
+    this.description = '',
     this.id = 'com.neonfuto.theme',
     this.version = '1.0',
     this.autoBorders = true,
@@ -89,6 +104,8 @@ class FutoTheme {
     this.fontPath,
     this.keyShape = '',
     this.backgroundImage,
+    this.gradientColors,
+    this.useGradient = false,
     this.borderImage,
     this.customAssets = const {},
     // الألوان الافتراضية
@@ -136,6 +153,17 @@ class FutoTheme {
     this.keyboardShadow = Colors.black45,
     this.keyboardBorder = Colors.white24,
     this.keyboardRipple = const Color(0x33FFFFFF),
+    this.surfaceTint = const Color(0xFF6C63FF),
+    this.surfaceBright = const Color(0xFF3A3A5A),
+    this.surfaceDim = const Color(0xFF0F0F1A),
+    this.surfaceContainer = const Color(0xFF1A1A2E),
+    this.surfaceContainerHigh = const Color(0xFF252540),
+    this.surfaceContainerHighest = const Color(0xFF303050),
+    this.surfaceContainerLow = const Color(0xFF15152A),
+    this.surfaceContainerLowest = const Color(0xFF0A0A15),
+    this.keyboardSurfaceVariant = const Color(0xFF252540),
+    this.keyboardContainerVariant = const Color(0xFF303050),
+
   });
 
   /// تحويل الثيم إلى Map للتصدير بصيغة TOML

@@ -113,6 +113,16 @@ class ZipExporter {
     buffer.writeln('keyboard_shadow = "${_hex(theme.keyboardShadow)}"');
     buffer.writeln('keyboard_border = "${_hex(theme.keyboardBorder)}"');
     buffer.writeln('keyboard_ripple = "${_hex(theme.keyboardRipple)}"');
+    buffer.writeln('surface_tint = "${_hex(theme.surfaceTint)}"');
+    buffer.writeln('surface_bright = "${_hex(theme.surfaceBright)}"');
+    buffer.writeln('surface_dim = "${_hex(theme.surfaceDim)}"');
+    buffer.writeln('surface_container = "${_hex(theme.surfaceContainer)}"');
+    buffer.writeln('surface_container_high = "${_hex(theme.surfaceContainerHigh)}"');
+    buffer.writeln('surface_container_highest = "${_hex(theme.surfaceContainerHighest)}"');
+    buffer.writeln('surface_container_low = "${_hex(theme.surfaceContainerLow)}"');
+    buffer.writeln('surface_container_lowest = "${_hex(theme.surfaceContainerLowest)}"');
+    buffer.writeln('keyboard_surface_variant = "${_hex(theme.keyboardSurfaceVariant)}"');
+    buffer.writeln('keyboard_container_variant = "${_hex(theme.keyboardContainerVariant)}"');
     buffer.writeln();
 
     if (shapeAssetName != null) {
