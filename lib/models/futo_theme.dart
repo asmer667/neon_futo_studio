@@ -19,6 +19,7 @@ class FutoTheme {
   int borderBottomInset;
   String fontFamily;
   String? fontPath;
+  String keyShape;
   String? backgroundImage;
   String? borderImage;
   Map<String, String> customAssets;
@@ -86,6 +87,7 @@ class FutoTheme {
     this.borderBottomInset = 20,
     this.fontFamily = 'Cairo',
     this.fontPath,
+    this.keyShape = '',
     this.backgroundImage,
     this.borderImage,
     this.customAssets = const {},

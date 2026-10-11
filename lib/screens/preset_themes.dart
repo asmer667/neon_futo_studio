@@ -1,13 +1,60 @@
 import 'package:flutter/material.dart';
-import '../models/keyboard_theme.dart';
+import '../models/futo_theme.dart';
 import 'editor_screen.dart';
 
 class PresetThemesScreen extends StatelessWidget {
   const PresetThemesScreen({super.key});
 
+  List<FutoTheme> _getThemes() {
+    return [
+      FutoTheme(
+        name: 'ثيم القلوب',
+        keyboardSurface: const Color(0xFF2D1B2E),
+        keyboardContainer: const Color(0xFFE91E63),
+        keyboardPrimary: const Color(0xFFFF4081),
+        onKeyboard: Colors.white,
+      ),
+      FutoTheme(
+        name: 'ثيم النجوم',
+        keyboardSurface: const Color(0xFF1A1A3E),
+        keyboardContainer: const Color(0xFFFFD700),
+        keyboardPrimary: const Color(0xFFFFA000),
+        onKeyboard: Colors.black,
+      ),
+      FutoTheme(
+        name: 'ثيم الدوائر',
+        keyboardSurface: const Color(0xFF1B2E1B),
+        keyboardContainer: const Color(0xFF4CAF50),
+        keyboardPrimary: const Color(0xFF81C784),
+        onKeyboard: Colors.white,
+      ),
+      FutoTheme(
+        name: 'ثيم السداسي',
+        keyboardSurface: const Color(0xFF2E1B1B),
+        keyboardContainer: const Color(0xFFFF5722),
+        keyboardPrimary: const Color(0xFFFF8A65),
+        onKeyboard: Colors.white,
+      ),
+      FutoTheme(
+        name: 'ثيم الماس',
+        keyboardSurface: const Color(0xFF1B1B2E),
+        keyboardContainer: const Color(0xFF9C27B0),
+        keyboardPrimary: const Color(0xFFBA68C8),
+        onKeyboard: Colors.white,
+      ),
+      FutoTheme(
+        name: 'ثيم الثلج',
+        keyboardSurface: const Color(0xFF1B2E3E),
+        keyboardContainer: const Color(0xFF00BCD4),
+        keyboardPrimary: const Color(0xFF4DD0E1),
+        onKeyboard: Colors.white,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final themes = PresetThemes.all;
+    final themes = _getThemes();
     return Scaffold(
       appBar: AppBar(title: const Text('الثيمات الجاهزة')),
       body: GridView.builder(
@@ -30,68 +77,34 @@ class PresetThemesScreen extends StatelessWidget {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: theme.layer2,
+                color: theme.keyboardSurface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: theme.layer6),
-                boxShadow: [
-                  BoxShadow(color: theme.layer3.withOpacity(0.3), blurRadius: 15),
-                ],
+                border: Border.all(color: Colors.white24),
               ),
               child: Column(
                 children: [
                   Expanded(
                     child: Center(
                       child: Icon(
-                        _iconForShape(theme.keyShape),
+                        Icons.keyboard,
                         size: 60,
-                        color: theme.layer3,
+                        color: theme.keyboardContainer,
                       ),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: theme.layer3.withOpacity(0.2),
+                      color: theme.keyboardContainer.withOpacity(0.2),
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          theme.name,
-                          style: TextStyle(
-                            color: theme.layer5,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, size: 20),
-                              color: theme.layer5,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => EditorScreen(initialTheme: theme),
-                                  ),
-                                );
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.download, size: 20),
-                              color: theme.layer5,
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('سيتم تصدير ${theme.name}')),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: Text(
+                      theme.name,
+                      style: TextStyle(
+                        color: theme.onKeyboard,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
@@ -101,17 +114,5 @@ class PresetThemesScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  IconData _iconForShape(String shape) {
-    switch (shape) {
-      case 'heart': return Icons.favorite;
-      case 'star': return Icons.star;
-      case 'circle': return Icons.circle;
-      case 'hexagon': return Icons.hexagon;
-      case 'diamond': return Icons.diamond;
-      case 'snowflake': return Icons.ac_unit;
-      default: return Icons.square;
-    }
   }
 }

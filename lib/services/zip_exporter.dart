@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import '../models/futo_theme.dart';
@@ -10,12 +12,12 @@ class ZipExporter {
     final archive = Archive();
     final Map<String, List<int>> assets = {};
 
-    // ========== 1. نسخ صورة الشكل المختار ==========
+    // 1. نسخ صورة الشكل المختار
     String? shapeAssetName;
     if (theme.keyShape.isNotEmpty && theme.keyShape.startsWith('assets/')) {
       try {
         final ByteData data = await rootBundle.load(theme.keyShape);
-        final bytes = data.buffer.asUint8List();
+        final Uint8List bytes = data.buffer.asUint8List();
         shapeAssetName = theme.keyShape.split('/').last;
         assets[shapeAssetName] = bytes;
       } catch (e) {
@@ -23,12 +25,12 @@ class ZipExporter {
       }
     }
 
-    // ========== 2. نسخ الخلفية ==========
+    // 2. نسخ الخلفية
     String? bgAssetName;
     if (theme.backgroundImage != null && theme.backgroundImage!.isNotEmpty) {
       try {
         final ByteData data = await rootBundle.load(theme.backgroundImage!);
-        final bytes = data.buffer.asUint8List();
+        final Uint8List bytes = data.buffer.asUint8List();
         bgAssetName = theme.backgroundImage!.split('/').last;
         assets[bgAssetName] = bytes;
       } catch (e) {
@@ -36,12 +38,14 @@ class ZipExporter {
       }
     }
 
-    // ========== 2.b نسخ الخط المرفوع ==========
+    // 3. نسخ الخط المرفوع
     String? fontAssetName;
+    if (theme.fontPath != null && theme.fontPath!.isNotEmpty) {
       try {
         final file = File(theme.fontPath!);
         if (await file.exists()) {
-          final bytes = await file.readAsBytes();
+          final Uint8List bytes = await file.readAsBytes();
+          fontAssetName = theme.fontPath!.split('/').last;
           assets[fontAssetName] = bytes;
         }
       } catch (e) {
@@ -49,12 +53,12 @@ class ZipExporter {
       }
     }
 
-    // ========== 3. إضافة الأصول إلى الأرشيف ==========
+    // 4. إضافة الأصول إلى الأرشيف
     for (final entry in assets.entries) {
       archive.addFile(ArchiveFile('assets/${entry.key}', entry.value.length, entry.value));
     }
 
-    // ========== 4. توليد theme.txt بصيغة TOML ==========
+    // 5. توليد theme.txt
     final buffer = StringBuffer();
     buffer.writeln('version = "${theme.version}"');
     buffer.writeln('name = "${theme.name}"');
@@ -62,7 +66,6 @@ class ZipExporter {
     buffer.writeln('id = "${theme.id}"');
     buffer.writeln();
 
-    // ===== قسم الإعدادات =====
     buffer.writeln('[options]');
     buffer.writeln('auto_borders = ${theme.autoBorders}');
     buffer.writeln('center_hints = ${theme.centerHints}');
@@ -70,7 +73,6 @@ class ZipExporter {
     buffer.writeln('weight_text = ${theme.weightText}');
     buffer.writeln();
 
-    // ===== قسم الألوان (44 لوناً) =====
     buffer.writeln('[colors]');
     buffer.writeln('primary = "${_hex(theme.primary)}"');
     buffer.writeln('on_primary = "${_hex(theme.onPrimary)}"');
@@ -98,9 +100,6 @@ class ZipExporter {
     buffer.writeln('outline_variant = "${_hex(theme.outlineVariant)}"');
     buffer.writeln('shadow = "${_hex(theme.shadow)}"');
     buffer.writeln('scrim = "${_hex(theme.scrim)}"');
-    buffer.writeln('inverse_surface = "${_hex(theme.inverseSurface)}"');
-    buffer.writeln('inverse_on_surface = "${_hex(theme.inverseOnSurface)}"');
-    buffer.writeln('inverse_primary = "${_hex(theme.inversePrimary)}"');
     buffer.writeln('keyboard_surface = "${_hex(theme.keyboardSurface)}"');
     buffer.writeln('keyboard_container = "${_hex(theme.keyboardContainer)}"');
     buffer.writeln('on_keyboard = "${_hex(theme.onKeyboard)}"');
@@ -109,8 +108,6 @@ class ZipExporter {
     buffer.writeln('keyboard_on_primary = "${_hex(theme.keyboardOnPrimary)}"');
     buffer.writeln('keyboard_secondary = "${_hex(theme.keyboardSecondary)}"');
     buffer.writeln('keyboard_on_secondary = "${_hex(theme.keyboardOnSecondary)}"');
-    buffer.writeln('keyboard_tertiary = "${_hex(theme.keyboardTertiary)}"');
-    buffer.writeln('keyboard_on_tertiary = "${_hex(theme.keyboardOnTertiary)}"');
     buffer.writeln('keyboard_error = "${_hex(theme.keyboardError)}"');
     buffer.writeln('keyboard_on_error = "${_hex(theme.keyboardOnError)}"');
     buffer.writeln('keyboard_shadow = "${_hex(theme.keyboardShadow)}"');
@@ -118,7 +115,6 @@ class ZipExporter {
     buffer.writeln('keyboard_ripple = "${_hex(theme.keyboardRipple)}"');
     buffer.writeln();
 
-    // ===== قسم Matchrules (ربط الصور بالأزرار) =====
     if (shapeAssetName != null) {
       buffer.writeln('[matchrules]');
       buffer.writeln('border_matchrules = [');
@@ -127,10 +123,7 @@ class ZipExporter {
       buffer.writeln('  { match = "pressed", asset = "assets/$shapeAssetName" },');
       buffer.writeln(']');
       buffer.writeln();
-    }
 
-    // ===== قسم 9-slicing للحدود =====
-    if (shapeAssetName != null) {
       buffer.writeln('[options.border]');
       buffer.writeln('left_inset = ${theme.borderLeftInset}');
       buffer.writeln('top_inset = ${theme.borderTopInset}');
@@ -139,31 +132,22 @@ class ZipExporter {
       buffer.writeln();
     }
 
-    // ===== قسم الخلفية =====
     if (bgAssetName != null) {
       buffer.writeln('[options.background]');
       buffer.writeln('image = "assets/$bgAssetName"');
       buffer.writeln('opacity = 1.0');
-      buffer.writeln('action_bar_opacity = 0.5');
       buffer.writeln();
     }
 
-    // ===== قسم الخط =====
     if (fontAssetName != null) {
       buffer.writeln('[options.font]');
       buffer.writeln('font = "assets/$fontAssetName"');
       buffer.writeln();
-    } else if (theme.fontFamily.isNotEmpty && theme.fontFamily != 'Cairo') {
-      buffer.writeln('[options.font]');
-      buffer.writeln('font = "assets/${theme.fontFamily}.ttf"');
-      buffer.writeln();
     }
 
-    // ========== 5. إضافة theme.txt إلى الأرشيف ==========
     final configContent = utf8.encode(buffer.toString());
     archive.addFile(ArchiveFile('theme.txt', configContent.length, configContent));
 
-    // ========== 6. إنشاء ملف ZIP ==========
     final zipData = ZipEncoder().encode(archive);
     final dir = await getApplicationDocumentsDirectory();
     final safeName = fileName.replaceAll(RegExp(r'[^\w\s-]'), '_');
