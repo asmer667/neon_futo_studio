@@ -82,6 +82,7 @@ class ZipExporter {
     buffer.writeln('on_primary = "${_hex(theme.onPrimary)}"');
     buffer.writeln('primary_container = "${_hex(theme.primaryContainer)}"');
     buffer.writeln('on_primary_container = "${_hex(theme.onPrimaryContainer)}"');
+    buffer.writeln('inverse_primary = "${_hex(theme.inversePrimary)}"');
     buffer.writeln('secondary = "${_hex(theme.secondary)}"');
     buffer.writeln('on_secondary = "${_hex(theme.onSecondary)}"');
     buffer.writeln('secondary_container = "${_hex(theme.secondaryContainer)}"');
@@ -112,12 +113,16 @@ class ZipExporter {
     buffer.writeln('keyboard_on_primary = "${_hex(theme.keyboardOnPrimary)}"');
     buffer.writeln('keyboard_secondary = "${_hex(theme.keyboardSecondary)}"');
     buffer.writeln('keyboard_on_secondary = "${_hex(theme.keyboardOnSecondary)}"');
+    buffer.writeln('keyboard_tertiary = "${_hex(theme.keyboardTertiary)}"');
+    buffer.writeln('keyboard_on_tertiary = "${_hex(theme.keyboardOnTertiary)}"');
     buffer.writeln('keyboard_error = "${_hex(theme.keyboardError)}"');
     buffer.writeln('keyboard_on_error = "${_hex(theme.keyboardOnError)}"');
     buffer.writeln('keyboard_shadow = "${_hex(theme.keyboardShadow)}"');
     buffer.writeln('keyboard_border = "${_hex(theme.keyboardBorder)}"');
     buffer.writeln('keyboard_ripple = "${_hex(theme.keyboardRipple)}"');
     buffer.writeln('surface_tint = "${_hex(theme.surfaceTint)}"');
+    buffer.writeln('inverse_surface = "${_hex(theme.inverseSurface)}"');
+    buffer.writeln('inverse_on_surface = "${_hex(theme.inverseOnSurface)}"');
     buffer.writeln('surface_bright = "${_hex(theme.surfaceBright)}"');
     buffer.writeln('surface_dim = "${_hex(theme.surfaceDim)}"');
     buffer.writeln('surface_container = "${_hex(theme.surfaceContainer)}"');
