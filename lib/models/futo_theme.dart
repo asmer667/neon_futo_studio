@@ -21,6 +21,10 @@ class FutoTheme {
   String fontFamily;
   String? fontPath;
   String keyShape;
+  String normalShape;      // شكل الأزرار العادية
+  String functionalShape;  // شكل الأزرار الوظيفية (Shift, Backspace, Enter)
+  String actionShape;      // شكل أزرار الإجراءات
+  String pressedShape;     // شكل الأزرار المضغوطة
   String? backgroundImage;
   List<Color>? gradientColors;
   bool useGradient;
@@ -107,6 +111,10 @@ class FutoTheme {
     this.fontFamily = 'Cairo',
     this.fontPath,
     this.keyShape = '',
+    this.normalShape = '',
+    this.functionalShape = '',
+    this.actionShape = '',
+    this.pressedShape = '',
     this.backgroundImage,
     this.gradientColors,
     this.useGradient = false,

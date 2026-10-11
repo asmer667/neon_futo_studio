@@ -12,21 +12,50 @@ class ZipExporter {
     final archive = Archive();
     final Map<String, List<int>> assets = {};
 
-    // 1. نسخ صورة الشكل المختار (إن وجدت)
-    String? shapeAssetName;
-    if (theme.keyShape.isNotEmpty && theme.keyShape.startsWith('assets/')) {
+    // 1. نسخ صور الأشكال الأربعة
+    String? normalAsset;
+    String? functionalAsset;
+    String? actionAsset;
+    String? pressedAsset;
+
+    // الأزرار العادية
+    final normalPath = theme.normalShape.isNotEmpty ? theme.normalShape : theme.keyShape;
+    if (normalPath.isNotEmpty && normalPath.startsWith('assets/')) {
       try {
-        final ByteData data = await rootBundle.load(theme.keyShape);
-        final Uint8List bytes = data.buffer.asUint8List();
-        // نحول الشكل إلى 4 صور للأزرار الأربعة
-        assets['Button-default.png'] = bytes;
-        assets['Button-default-press.png'] = bytes;
-        assets['Button-function.png'] = bytes;
-        assets['Button-action.png'] = bytes;
-        shapeAssetName = 'Button-default.png';
-      } catch (e) {
-        // تجاهل
-      }
+        final ByteData data = await rootBundle.load(normalPath);
+        assets['Button-default.png'] = data.buffer.asUint8List();
+        normalAsset = 'Button-default.png';
+      } catch (e) {}
+    }
+
+    // الأزرار الوظيفية
+    final functionalPath = theme.functionalShape.isNotEmpty ? theme.functionalShape : theme.keyShape;
+    if (functionalPath.isNotEmpty && functionalPath.startsWith('assets/')) {
+      try {
+        final ByteData data = await rootBundle.load(functionalPath);
+        assets['Button-function.png'] = data.buffer.asUint8List();
+        functionalAsset = 'Button-function.png';
+      } catch (e) {}
+    }
+
+    // أزرار الإجراءات
+    final actionPath = theme.actionShape.isNotEmpty ? theme.actionShape : theme.keyShape;
+    if (actionPath.isNotEmpty && actionPath.startsWith('assets/')) {
+      try {
+        final ByteData data = await rootBundle.load(actionPath);
+        assets['Button-action.png'] = data.buffer.asUint8List();
+        actionAsset = 'Button-action.png';
+      } catch (e) {}
+    }
+
+    // الأزرار المضغوطة
+    final pressedPath = theme.pressedShape.isNotEmpty ? theme.pressedShape : theme.keyShape;
+    if (pressedPath.isNotEmpty && pressedPath.startsWith('assets/')) {
+      try {
+        final ByteData data = await rootBundle.load(pressedPath);
+        assets['Button-default-press.png'] = data.buffer.asUint8List();
+        pressedAsset = 'Button-default-press.png';
+      } catch (e) {}
     }
 
     // 2. نسخ الخلفية (إن وجدت)
@@ -157,66 +186,34 @@ class ZipExporter {
     }
 
     // ===== قسم matchrules =====
-    if (shapeAssetName != null) {
+    if (normalAsset != null) {
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "pressed"');
-      buffer.writeln('asset = "Button-default-press.png"');
+      buffer.writeln('asset = "${pressedAsset ?? normalAsset}"');
       buffer.writeln();
+
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "functional"');
-      buffer.writeln('asset = "Button-function.png"');
+      buffer.writeln('asset = "${functionalAsset ?? normalAsset}"');
       buffer.writeln();
+
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "action"');
-      buffer.writeln('asset = "Button-action.png"');
+      buffer.writeln('asset = "${actionAsset ?? normalAsset}"');
       buffer.writeln();
+
       buffer.writeln('[[matchrules.border]]');
       buffer.writeln('selector = "normal"');
-      buffer.writeln('asset = "Button-default.png"');
+      buffer.writeln('asset = "$normalAsset"');
       buffer.writeln();
     }
 
     // ===== قسم asset.border =====
-    if (shapeAssetName != null) {
-      buffer.writeln('[[asset.border]]');
-      buffer.writeln('name = "Button-default.png"');
-      buffer.writeln('background_tint = "#ffffff"');
-      buffer.writeln('foreground_tint = "${_hexA(theme.onKeyboard)}"');
-      buffer.writeln('padding = [0, 0, 0, 0]');
-      buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
-      buffer.writeln('gap = [1, 1, 1, 1]');
-      buffer.writeln('target_density = 640');
-      buffer.writeln();
-
-      buffer.writeln('[[asset.border]]');
-      buffer.writeln('name = "Button-default-press.png"');
-      buffer.writeln('background_tint = "#ffffff"');
-      buffer.writeln('foreground_tint = "#ffffff"');
-      buffer.writeln('padding = [0, 0, 0, 0]');
-      buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
-      buffer.writeln('gap = [1, 1, 1, 1]');
-      buffer.writeln('target_density = 640');
-      buffer.writeln();
-
-      buffer.writeln('[[asset.border]]');
-      buffer.writeln('name = "Button-function.png"');
-      buffer.writeln('background_tint = "#ffffff"');
-      buffer.writeln('foreground_tint = "${_hexA(theme.onKeyboard)}"');
-      buffer.writeln('padding = [0, 0, 0, 0]');
-      buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
-      buffer.writeln('gap = [1, 1, 1, 1]');
-      buffer.writeln('target_density = 640');
-      buffer.writeln();
-
-      buffer.writeln('[[asset.border]]');
-      buffer.writeln('name = "Button-action.png"');
-      buffer.writeln('background_tint = "#ffffff"');
-      buffer.writeln('foreground_tint = "${_hexA(theme.onKeyboard)}"');
-      buffer.writeln('padding = [0, 0, 0, 0]');
-      buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
-      buffer.writeln('gap = [1, 1, 1, 1]');
-      buffer.writeln('target_density = 640');
-      buffer.writeln();
+    if (normalAsset != null) {
+      _writeAssetBorder(buffer, 'Button-default.png', theme.onKeyboard);
+      if (pressedAsset != null) _writeAssetBorder(buffer, 'Button-default-press.png', Colors.white);
+      if (functionalAsset != null) _writeAssetBorder(buffer, 'Button-function.png', theme.onKeyboard);
+      if (actionAsset != null) _writeAssetBorder(buffer, 'Button-action.png', theme.onKeyboard);
     }
 
     // 6. إضافة theme.txt إلى الأرشيف
@@ -238,6 +235,19 @@ class ZipExporter {
     }
 
     return savedPath;
+  }
+
+
+  void _writeAssetBorder(StringBuffer buffer, String name, Color fg) {
+    buffer.writeln('[[asset.border]]');
+    buffer.writeln('name = "$name"');
+    buffer.writeln('background_tint = "#ffffff"');
+    buffer.writeln('foreground_tint = "${_hexA(fg)}"');
+    buffer.writeln('padding = [0, 0, 0, 0]');
+    buffer.writeln('slicing = [0.3, 0.3, 0.7, 0.7]');
+    buffer.writeln('gap = [1, 1, 1, 1]');
+    buffer.writeln('target_density = 640');
+    buffer.writeln();
   }
 
   /// تحويل اللون إلى صيغة #RRGGBBAA (كما يطلب FUTO)

@@ -8,6 +8,7 @@ import 'border_settings_screen.dart';
 import 'assets_screen.dart';
 import 'theme_settings_screen.dart';
 import 'gradients_screen.dart';
+import 'key_types_screen.dart';
 import '../models/futo_theme.dart';
 import '../core/translations.dart';
 import '../services/zip_exporter.dart';
@@ -382,27 +383,44 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
       children: [
         _sectionHeader(AppTranslations.get('border_matchrules'), Icons.crop_square),
         const SizedBox(height: 10),
-        Card(
-          child: ListTile(
-            leading: _theme.keyShape.isNotEmpty && _theme.keyShape.startsWith('assets/')
-                ? Image.asset(_theme.keyShape, width: 40, height: 40,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.category))
-                : const Icon(Icons.category),
-            title: Text(
-              _theme.keyShape.isEmpty
-                  ? 'لم يتم اختيار شكل'
-                  : _theme.keyShape.split('/').last,
-            ),
-            subtitle: const Text('الشكل المطبق على الأزرار'),
-            trailing: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _pickShape,
-            ),
-          ),
+
+        _keyTypeTile(
+          title: 'الأزرار العادية',
+          subtitle: 'الحروف والأرقام',
+          icon: Icons.keyboard,
+          shapePath: _theme.normalShape.isNotEmpty ? _theme.normalShape : _theme.keyShape,
+          onPick: () => _pickKeyType('normal'),
+        ),
+        const SizedBox(height: 10),
+
+        _keyTypeTile(
+          title: 'الأزرار الوظيفية',
+          subtitle: 'Shift, Backspace, Enter',
+          icon: Icons.settings,
+          shapePath: _theme.functionalShape.isNotEmpty ? _theme.functionalShape : _theme.keyShape,
+          onPick: () => _pickKeyType('functional'),
+        ),
+        const SizedBox(height: 10),
+
+        _keyTypeTile(
+          title: 'أزرار الإجراءات',
+          subtitle: 'Action, Emoji, Voice',
+          icon: Icons.touch_app,
+          shapePath: _theme.actionShape.isNotEmpty ? _theme.actionShape : _theme.keyShape,
+          onPick: () => _pickKeyType('action'),
+        ),
+        const SizedBox(height: 10),
+
+        _keyTypeTile(
+          title: 'الأزرار المضغوطة',
+          subtitle: 'عند الضغط على الزر',
+          icon: Icons.ads_click,
+          shapePath: _theme.pressedShape.isNotEmpty ? _theme.pressedShape : _theme.keyShape,
+          onPick: () => _pickKeyType('pressed'),
         ),
         const SizedBox(height: 20),
 
-        _sectionHeader(AppTranslations.get('icon_matchrules'), Icons.emoji_emotions),
+        _sectionHeader('ICON MATCHRULES', Icons.emoji_emotions),
         const SizedBox(height: 10),
         Card(
           child: ListTile(
@@ -442,9 +460,6 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     );
   }
 
-  // ============================================================
-  // تبويب Assets
-  // ============================================================
   Widget _buildAssetsTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
