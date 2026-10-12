@@ -49,6 +49,10 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
 
   bool _isLoading = true;
 
+  // تصنيفات V1 و V2 (حسب الرقم)
+  final List<String> _v2Categories = ['الكل', '1-500', '501-1000', '1001-1500', '1501-2000', '2001-2500'];
+  String _selectedV2Category = 'الكل';
+
   final List<String> _shapeCategories = [
     'الكل', 'كلاسيكية', 'نجوم', 'قلوب', 'دوائر', 'سداسية',
     'ماسية', 'موجات', 'زهور', 'كريستال', 'ثلج', 'نار',
@@ -97,22 +101,60 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
   void _filterButtonsV1() {
     setState(() {
       final query = _searchController.text.toLowerCase();
-      if (query.isEmpty) {
-        _filteredButtonsV1 = _allButtonsV1;
-      } else {
-        _filteredButtonsV1 = _allButtonsV1.where((b) => b.toLowerCase().contains(query)).toList();
+      List<String> result = _allButtonsV1;
+
+      // تطبيق تصنيف V1
+      if (_selectedV2Category != 'الكل') {
+        final parts = _selectedV2Category.split('-');
+        final start = int.parse(parts[0]);
+        final end = int.parse(parts[1]);
+
+        result = result.where((b) {
+          final numMatch = RegExp(r'\d+').firstMatch(b);
+          if (numMatch != null) {
+            final num = int.parse(numMatch.group(0)!);
+            return num >= start && num <= end;
+          }
+          return false;
+        }).toList();
       }
+
+      // تطبيق البحث
+      if (query.isNotEmpty) {
+        result = result.where((b) => b.toLowerCase().contains(query)).toList();
+      }
+
+      _filteredButtonsV1 = result;
     });
   }
 
   void _filterButtonsV2() {
     setState(() {
       final query = _searchController.text.toLowerCase();
-      if (query.isEmpty) {
-        _filteredButtonsV2 = _allButtonsV2;
-      } else {
-        _filteredButtonsV2 = _allButtonsV2.where((b) => b.toLowerCase().contains(query)).toList();
+      List<String> result = _allButtonsV2;
+
+      // تطبيق تصنيف V2
+      if (_selectedV2Category != 'الكل') {
+        final parts = _selectedV2Category.split('-');
+        final start = int.parse(parts[0]);
+        final end = int.parse(parts[1]);
+
+        result = result.where((b) {
+          final numMatch = RegExp(r'\d+').firstMatch(b);
+          if (numMatch != null) {
+            final num = int.parse(numMatch.group(0)!);
+            return num >= start && num <= end;
+          }
+          return false;
+        }).toList();
       }
+
+      // تطبيق البحث
+      if (query.isNotEmpty) {
+        result = result.where((b) => b.toLowerCase().contains(query)).toList();
+      }
+
+      _filteredButtonsV2 = result;
     });
   }
 
@@ -242,6 +284,7 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
                         isEnglish: widget.isEnglish,
                         onApply: (newTheme) {
                           widget.onShapeSelected(shape.path);
+                          Navigator.pop(context);
                         },
                       ),
                     );
@@ -314,6 +357,33 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
             ),
           ),
         ),
+        // التصنيفات
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: _v2Categories.length,
+            itemBuilder: (ctx, i) {
+              final cat = _v2Categories[i];
+              final selected = cat == _selectedV2Category;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                  label: Text(cat),
+                  selected: selected,
+                  onSelected: (_) {
+                    setState(() => _selectedV2Category = cat);
+                    if (isV2) _filterButtonsV2();
+                    else _filterButtonsV1();
+                  },
+                  selectedColor: Colors.purple,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 5),
         // العدد
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -322,6 +392,33 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
             style: const TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ),
+        // التصنيفات
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: _v2Categories.length,
+            itemBuilder: (ctx, i) {
+              final cat = _v2Categories[i];
+              final selected = cat == _selectedV2Category;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                  label: Text(cat),
+                  selected: selected,
+                  onSelected: (_) {
+                    setState(() => _selectedV2Category = cat);
+                    if (isV2) _filterButtonsV2();
+                    else _filterButtonsV1();
+                  },
+                  selectedColor: Colors.purple,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 5),
         const SizedBox(height: 10),
         Expanded(
           child: GridView.builder(
@@ -350,6 +447,7 @@ class _KeyTypesScreenState extends State<KeyTypesScreen> {
                         isEnglish: widget.isEnglish,
                         onApply: (newTheme) {
                           widget.onShapeSelected(path);
+                          Navigator.pop(context);
                         },
                       ),
                     );
