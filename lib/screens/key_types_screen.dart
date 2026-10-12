@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/shape_data.dart';
+import '../models/futo_theme.dart';
 
 class KeyTypesScreen extends StatefulWidget {
   final String currentShape;
+  final FutoTheme? theme;
+  final bool isEnglish;
   final String title;
   final String type; // normal, pressed, functional, action
   final Function(String) onShapeSelected;
@@ -15,6 +18,8 @@ class KeyTypesScreen extends StatefulWidget {
     required this.title,
     required this.onShapeSelected,
     this.type = 'normal',
+    this.theme,
+    this.isEnglish = false,
   });
 
   @override
