@@ -300,8 +300,6 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             onPressed: () => _showLivePreview('معاينة مباشرة'),
             tooltip: 'معاينة',
           ),
-          IconButton(
-          ),
         ],
       ),
       body: Column(
