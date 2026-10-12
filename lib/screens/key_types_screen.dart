@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/shape_data.dart';
 import '../models/futo_theme.dart';
+import '../widgets/live_preview_dialog.dart';
 
 class KeyTypesScreen extends StatefulWidget {
   final String currentShape;

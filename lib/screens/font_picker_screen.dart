@@ -5,6 +5,8 @@ import '../widgets/live_preview_dialog.dart';
 class FontPickerScreen extends StatefulWidget {
   final Function(String) onFontSelected;
   final String? currentFont;
+  final FutoTheme? theme;
+  final bool isEnglish;
   const FontPickerScreen({super.key, required this.onFontSelected, this.currentFont});
 
   @override
