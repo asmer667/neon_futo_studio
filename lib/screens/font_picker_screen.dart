@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/futo_theme.dart';
 import '../widgets/live_preview_dialog.dart';
 
 class FontPickerScreen extends StatefulWidget {
@@ -7,7 +8,9 @@ class FontPickerScreen extends StatefulWidget {
   final String? currentFont;
   final FutoTheme? theme;
   final bool isEnglish;
-  const FontPickerScreen({super.key, required this.onFontSelected, this.currentFont});
+  const FontPickerScreen({super.key, required this.onFontSelected,
+    this.theme,
+    this.isEnglish = false, this.currentFont});
 
   @override
   State<FontPickerScreen> createState() => _FontPickerScreenState();
