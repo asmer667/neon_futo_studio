@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'theme_preview.dart';
 import '../models/futo_theme.dart';
+import '../widgets/live_preview_dialog.dart';
 
 class ColorsLibrary extends StatefulWidget {
   final Function(Color) onColorSelected;
   final Color initialColor;
   final FutoTheme? currentTheme;
+  final bool isEnglish;
 
   const ColorsLibrary({
     super.key,
     required this.onColorSelected,
     required this.initialColor,
     this.currentTheme,
+    this.isEnglish = false,
   });
 
   @override
@@ -264,7 +267,25 @@ class _ColorsLibraryState extends State<ColorsLibrary> {
                 return GestureDetector(
                   onTap: () {
                     setState(() => _selectedColor = color);
-                    _showPreviewDialog(color);
+                    if (widget.currentTheme != null) {
+                      final tempTheme = widget.currentTheme!;
+                      tempTheme.primary = color;
+                      tempTheme.keyboardPrimary = color;
+                      tempTheme.keyboardContainer = color.withOpacity(0.3);
+                      tempTheme.outline = color;
+                      tempTheme.keyboardBorder = color;
+                      showDialog(
+                        context: context,
+                        builder: (_) => LivePreviewDialog(
+                          theme: tempTheme,
+                          title: 'معاينة اللون',
+                          isEnglish: widget.isEnglish,
+                          onApply: (newTheme) {
+                            widget.onColorSelected(color);
+                          },
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     decoration: BoxDecoration(

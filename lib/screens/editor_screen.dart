@@ -9,10 +9,14 @@ import 'assets_screen.dart';
 import 'theme_settings_screen.dart';
 import 'gradients_screen.dart';
 import 'key_types_screen.dart';
+import 'overlay_screen.dart';
+import '../widgets/live_preview_dialog.dart';
 import '../models/futo_theme.dart';
 import '../core/translations.dart';
 import '../services/zip_exporter.dart';
 import '../services/history_service.dart';
+import '../services/theme_manager.dart';
+import 'saved_themes_screen.dart';
 
 class EditorScreen extends StatefulWidget {
   final FutoTheme? initialTheme;
@@ -84,6 +88,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         builder: (_) => ColorsLibrary(
           initialColor: current,
           currentTheme: _theme,
+          isEnglish: AppTranslations.isEnglish,
           onColorSelected: (c) {
             _saveUndo();
             setState(() => onPick(c));
@@ -161,8 +166,9 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
 
     if (result != null && result.isNotEmpty) {
       try {
-        // تحديث اسم الثيم
+        // تحديث اسم الثيم و ID فريد
         _theme.name = result;
+        _theme.id = _theme.generateUniqueId();
         
         final exporter = ZipExporter();
         final path = await exporter.exportTheme(_theme, result);
@@ -230,6 +236,64 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
               });
             },
             tooltip: AppTranslations.isEnglish ? 'العربية' : 'English',
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.orange),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: const Color(0xFF1A1A2E),
+                  title: const Text('إعادة الوضع الافتراضي'),
+                  content: const Text('هل تريد إعادة كل الإعدادات إلى الافتراضي؟'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('إلغاء'),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        _saveUndo();
+                        setState(() => _theme = FutoTheme());
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('✅ تم إعادة الوضع الافتراضي')),
+                        );
+                      },
+                      child: const Text('إعادة'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            tooltip: 'إعادة الوضع الافتراضي',
+          ),
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () async {
+              await ThemeManager.saveTheme(_theme);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('✅ تم حفظ الثيم')),
+                );
+              }
+            },
+            tooltip: 'حفظ الثيم',
+          ),
+          IconButton(
+            icon: const Icon(Icons.folder_open),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SavedThemesScreen()),
+              );
+            },
+            tooltip: 'الثيمات المحفوظة',
+          ),
+          IconButton(
+            icon: const Icon(Icons.preview),
+            onPressed: () => _showLivePreview('معاينة مباشرة'),
+            tooltip: 'معاينة',
           ),
           IconButton(
             icon: const Icon(Icons.download),
@@ -417,6 +481,31 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
           icon: Icons.ads_click,
           shapePath: _theme.pressedShape.isNotEmpty ? _theme.pressedShape : _theme.keyShape,
           onPick: () => _pickKeyType('pressed'),
+        ),
+        const SizedBox(height: 20),
+
+        Card(
+          color: Colors.purple.withOpacity(0.15),
+          child: ListTile(
+            leading: const Icon(Icons.layers, color: Colors.purple),
+            title: const Text('إضافة شكل لأي زر', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('صور فوق أزرار محددة'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => OverlayScreen(
+                    currentOverlays: _theme.overlays,
+                    onOverlaysUpdated: (overlays) {
+                      _saveUndo();
+                      setState(() => _theme.overlays = overlays);
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
         ),
         const SizedBox(height: 20),
 
@@ -946,6 +1035,32 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     );
   }
 
+
+  void _showLivePreview(String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => LivePreviewDialog(
+        theme: _theme,
+        title: title,
+        onApply: (newTheme) {
+          _saveUndo();
+          setState(() => _theme = newTheme);
+        },
+      ),
+    );
+  }
+
+
+  /// الحصول على الخط (مع دعم العربية)
+  String _getFontFamily() {
+    final font = _theme.fontFamily;
+    // إذا كان الخط لاتيني، نستخدم Cairo كاحتياطي للعربية
+    if (['Roboto', 'Poppins', 'Montserrat', 'Open Sans', 'Lato', 'Inter'].contains(font)) {
+      return 'Cairo'; // خط عربي افتراضي
+    }
+    return font;
+  }
+
   Widget _sectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -1048,7 +1163,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         style: TextStyle(
           color: _theme.onKeyboard,
           fontSize: 12,
-          fontFamily: _theme.fontFamily,
+          fontFamily: _getFontFamily(),
         ),
       ),
     );
@@ -1104,7 +1219,7 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                 label,
                 style: TextStyle(
                   color: textColor,
-                  fontFamily: _theme.fontFamily,
+                  fontFamily: _getFontFamily(),
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),

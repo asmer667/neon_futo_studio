@@ -58,6 +58,11 @@ flutter:
     - assets/24_fantasy/
     - assets/25_abstract/
     - assets/key_buttons_data.json
+    - assets/key_buttons_v2_data.json
+    - assets/key_buttons_v2/normal/
+    - assets/key_buttons_v2/functional/
+    - assets/key_buttons_v2/action/
+    - assets/key_buttons_v2/pressed/
     - assets/key_buttons/normal/
     - assets/key_buttons/pressed/
     - assets/key_buttons/functional/

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/live_preview_dialog.dart';
 
 class FontPickerScreen extends StatefulWidget {
   final Function(String) onFontSelected;
@@ -279,10 +280,27 @@ class _FontPickerScreenState extends State<FontPickerScreen> {
                     onTap: () async {
                       setState(() => _loadingFonts.add(font['family']!));
                       try {
-                        // تحميل الخط من Google Fonts
                         await GoogleFonts.pendingFonts();
-                        widget.onFontSelected(font['family']!);
-                        Navigator.pop(context);
+                        setState(() => _loadingFonts.remove(font['family']!));
+
+                        if (widget.theme != null) {
+                          final tempTheme = widget.theme!;
+                          tempTheme.fontFamily = font['family']!;
+                          showDialog(
+                            context: context,
+                            builder: (_) => LivePreviewDialog(
+                              theme: tempTheme,
+                              title: 'معاينة: ${font['name']}',
+                              isEnglish: widget.isEnglish,
+                              onApply: (newTheme) {
+                                widget.onFontSelected(font['family']!);
+                              },
+                            ),
+                          );
+                        } else {
+                          widget.onFontSelected(font['family']!);
+                          Navigator.pop(context);
+                        }
                       } catch (e) {
                         setState(() => _loadingFonts.remove(font['family']!));
                         if (mounted) {

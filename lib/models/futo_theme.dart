@@ -80,6 +80,9 @@ class FutoTheme {
   double cropRight;
   double cropBottom;
 
+  // Overlays (صور فوق أزرار محددة)
+  List<Map<String, dynamic>> overlays;
+
   // Config المتقدم
   double hintScale;
   int hintWeight;
@@ -216,6 +219,7 @@ class FutoTheme {
     this.cropTop = 0.0,
     this.cropRight = 1.0,
     this.cropBottom = 1.0,
+    this.overlays = const [],
     this.hintScale = 1.0,
     this.hintWeight = 400,
     this.keyBorders = true,
@@ -351,5 +355,14 @@ class FutoTheme {
 
   static String _colorToHex(Color color) {
     return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+  }
+
+  /// توليد ID فريد لكل ثيم
+  String generateUniqueId() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final safeName = name
+        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')
+        .toLowerCase();
+    return 'com.neonfuto.theme.${safeName}_$timestamp';
   }
 }

@@ -96,7 +96,11 @@ class ZipExporter {
     buffer.writeln('version = ${int.tryParse(theme.version) ?? 1}');
     buffer.writeln('name = "${theme.name}"');
     buffer.writeln('author = "${theme.author}"');
-    buffer.writeln('id = "${theme.id}"');
+    // توليد ID فريد لكل ثيم
+    final uniqueId = theme.id.isEmpty || theme.id == 'com.neonfuto.theme'
+        ? theme.generateUniqueId()
+        : theme.id;
+    buffer.writeln('id = "$uniqueId"');
     if (theme.description.isNotEmpty) {
       buffer.writeln('description = "${theme.description}"');
     }
@@ -260,6 +264,31 @@ class ZipExporter {
     if (theme.shiftIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-shift.png');
     if (theme.enterIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-enter.png');
     if (theme.emojiIcon.isNotEmpty) _writeAssetIcon(buffer, 'Icon-emoji.png');
+
+    // ===== قسم overlays =====
+    if (theme.overlays.isNotEmpty) {
+      for (var overlay in theme.overlays) {
+        final overlayPath = overlay['imagePath'] as String? ?? '';
+        if (overlayPath.isNotEmpty) {
+          try {
+            final ByteData data = await rootBundle.load(overlayPath);
+            final overlayName = overlayPath.split('/').last;
+            final fullName = 'Overlay-${overlay['keyLabel']}-$overlayName';
+            archive.addFile(ArchiveFile(fullName, data.lengthInBytes, data.buffer.asUint8List()));
+
+            buffer.writeln('[[overlay]]');
+            buffer.writeln('key = "${overlay['keyLabel']}"');
+            buffer.writeln('asset = "$fullName"');
+            buffer.writeln('size = ${overlay['size']}');
+            buffer.writeln('offset_x = ${overlay['offsetX']}');
+            buffer.writeln('offset_y = ${overlay['offsetY']}');
+            buffer.writeln('width = ${overlay['width']}');
+            buffer.writeln('height = ${overlay['height']}');
+            buffer.writeln();
+          } catch (e) {}
+        }
+      }
+    }
 
     // 6. إضافة theme.txt إلى الأرشيف
     final configContent = utf8.encode(buffer.toString());

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import '../models/futo_theme.dart';
+import '../widgets/live_preview_dialog.dart';
 
 class BackgroundsScreen extends StatefulWidget {
   final Function(String path) onBackgroundSelected;
   final String? currentBackground;
+  final FutoTheme? theme;
 
   const BackgroundsScreen({
     super.key,
     required this.onBackgroundSelected,
     this.currentBackground,
+    this.theme,
   });
 
   @override
@@ -80,10 +84,25 @@ class _BackgroundsScreenState extends State<BackgroundsScreen> {
                 final isSelected = widget.currentBackground == bg['path'];
                 return GestureDetector(
                   onTap: () {
-                    widget.onBackgroundSelected(bg['path']!);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('تم اختيار ${bg['name']}')),
-                    );
+                    if (widget.theme != null) {
+                      final tempTheme = widget.theme!;
+                      tempTheme.backgroundImage = bg['path'];
+                      showDialog(
+                        context: context,
+                        builder: (_) => LivePreviewDialog(
+                          theme: tempTheme,
+                          title: 'معاينة: ${bg['name']}',
+                          onApply: (newTheme) {
+                            widget.onBackgroundSelected(bg['path']!);
+                          },
+                        ),
+                      );
+                    } else {
+                      widget.onBackgroundSelected(bg['path']!);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('تم اختيار ${bg['name']}')),
+                      );
+                    }
                   },
                   child: Container(
                     decoration: BoxDecoration(
