@@ -204,6 +204,11 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.download, color: Colors.green),
+            onPressed: _exportTheme,
+            tooltip: 'تصدير ZIP',
+          ),
+          IconButton(
             icon: const Icon(Icons.undo),
             onPressed: _undo,
             tooltip: 'Undo',
@@ -296,9 +301,6 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             tooltip: 'معاينة',
           ),
           IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: _exportTheme,
-            tooltip: AppTranslations.get('export_zip'),
           ),
         ],
       ),
